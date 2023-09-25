@@ -1,4 +1,4 @@
-package com.ecommerce.discoveryservice;
+package com.clothesstore.discoveryservice;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
