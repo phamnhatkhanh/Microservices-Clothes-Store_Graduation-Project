@@ -1,0 +1,34 @@
+Customer:
+- Admin: call api get all data
+- system: save data
+write api CRUD
+
+template: https://github.dev/osopromadze/Spring-Boot-Blog-REST-API/blob/main/src/main/java/com/sopromadze/blogapi/service/UserService.java
+mapper: https://modelmapper.org/user-manual/configuration/#matching-strategies
+    https://github.dev/ferhatclk/RentACar/blob/Main/src/main/java/com/kodlamaio/rentAcar/bussines/response/cars/GetByIdCarResponse.java
+    https://github.com/arey/java-object-mapper-benchmark/blob/master/src/main/java/com/javaetmoi/benchmark/mapping/mapper/jmapper/JMapperMapper.java
+
+- setup win:
+- hôm xong xuôi phần customer + tìm phần tạo token.
+- set up luôn keycloack:
+
+
+
+
+System: save data
+- post:
+    1. map request -> model
+        1.1 save
+    2. model -> respone
+        Customer, Address
+    3. Check data time
+
+- get -> put -> delete(temporary).
+
+Admin:
+    Call api get all data
+        resolve problem paganani page.
+    Event -> save Customer database.
+
+
+Morgin: done api CRUD and register webhook -> get data.
