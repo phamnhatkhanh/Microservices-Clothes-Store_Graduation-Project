@@ -15,7 +15,7 @@ mapper: https://modelmapper.org/user-manual/configuration/#matching-strategies
 
 
 
-System: save data
+1. System:
 - post:
     1. map request -> model
         1.1 save
@@ -23,7 +23,22 @@ System: save data
         Customer, Address
     3. Check data time
 
-- get -> put -> delete(temporary).
+- get: optinal tìm ko thấy, tìm all, tìm list customer
+put: cập nhật lớp con
+
+2. Đăng ký web hook -> sync data về app -> lưu vào đoàng hoàng
+    Xoá đi.
+
+3. Phần quyền
+Làm dần dần các services.
+test đồ chạy ổn -> check kỹ logic // thật chuẩn chỉnh.
+xây dunựng frontend.
+
+Học docker deploy.
+Học k8 quản lý.
+
+Mowr rộng thêm.
+
 
 Admin:
     Call api get all data

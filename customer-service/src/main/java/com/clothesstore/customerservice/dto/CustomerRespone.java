@@ -29,6 +29,7 @@ public class CustomerRespone {
     private Float totalSpent;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String errorMessage;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Address> addresses;
     public List<Address> getAddresses() {

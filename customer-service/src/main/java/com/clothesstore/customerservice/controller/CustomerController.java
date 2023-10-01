@@ -1,12 +1,12 @@
 package com.clothesstore.customerservice.controller;
 
 import com.clothesstore.customerservice.dto.CustomerRespone;
-import com.clothesstore.customerservice.dto.CustomerResquest;
-import com.clothesstore.customerservice.model.Customer;
+import com.clothesstore.customerservice.dto.CustomerRequest;
 import com.clothesstore.customerservice.service.CustomerService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,9 +22,16 @@ public class CustomerController {
 
 
     @GetMapping("/{id}")
-    CustomerRespone getCustomer (@PathVariable Long id) {
-        return customerService.findById(id);
-
+    ResponseEntity<CustomerRespone> getCustomer (@PathVariable Long id) {
+        CustomerRespone response = customerService.findById(id);
+        if (response.getErrorMessage() != null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/byIds")
+    List<CustomerRespone> getListCustomers(@RequestParam List<Long> ids) {
+        return customerService.findAllById(ids);
     }
     @GetMapping("/")
     List<CustomerRespone> getListCustomers() {
@@ -32,14 +39,21 @@ public class CustomerController {
 
     }
     @PostMapping("/")
-    CustomerRespone createCustomer(@RequestBody CustomerResquest customerResquest) {
-        return customerService.save(customerResquest);
+    CustomerRespone createCustomer(@RequestBody CustomerRequest customerRequest) {
+        return customerService.save(customerRequest);
 
     }
-    @PutMapping("/{id}")
-    CustomerRespone updateCustomer(@RequestBody CustomerResquest customerResquest, @PathVariable Long id) {
+    @PutMapping("/test/{id}")
+    CustomerRespone updateCustomerTest(@RequestBody CustomerRequest customerRequest, @PathVariable Long id) {
 
-        return customerService.update(id, customerResquest);
+        return customerService.updateTest(id, customerRequest);
+
+    }
+
+    @PutMapping("/{id}")
+    CustomerRespone updateCustomer(@RequestBody CustomerRequest customerRequest, @PathVariable Long id) {
+
+        return customerService.update(id, customerRequest);
 //                .map(customer -> {
 //                    customer.setName(newCustomer.getName());
 //                    customer.setRole(newCustomer.getRole());

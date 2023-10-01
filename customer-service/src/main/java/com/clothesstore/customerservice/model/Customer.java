@@ -11,7 +11,8 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "customer", uniqueConstraints = @UniqueConstraint(columnNames = {"email", "phone"}))
+@Table(name = "customer")
+//@Table(name = "customer", uniqueConstraints = @UniqueConstraint(columnNames = {"email", "phone"}))
 @Getter
 @Setter
 @NoArgsConstructor

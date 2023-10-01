@@ -1,13 +1,10 @@
 package com.clothesstore.customerservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @Data
-public class AdressResquest {
+public class AddressRequest {
     @JsonProperty("first_name")
     private String firstName;
     @JsonProperty("last_name")

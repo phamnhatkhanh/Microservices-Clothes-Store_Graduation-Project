@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "address", uniqueConstraints = @UniqueConstraint(columnNames = {"phone"}))
-
+@Table(name = "address")
+//@Table(name = "address", uniqueConstraints = @UniqueConstraint(columnNames = {"phone"}))
 @Getter
 @Setter
 @NoArgsConstructor
