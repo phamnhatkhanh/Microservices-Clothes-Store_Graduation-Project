@@ -152,8 +152,8 @@ public class CustomerServiceImpl implements CustomerService {
 
 
         Customer dataCustomer = modelMapper.map(customerRequest,Customer.class);
-        log.info("data custoemr");
-        log.info(dataCustomer.toString());
+//        log.info("data custoemr");
+//        log.info(dataCustomer.toString());
         Field itemOldCustomer;
         Optional<Customer> resultFound = customerRepository.findById(id);
         if(resultFound.isPresent()){
@@ -201,91 +201,95 @@ public class CustomerServiceImpl implements CustomerService {
 
     }
     public CustomerRespone updateTest(Long id, CustomerRequest customerRequest){
+        Optional<Customer> resultFoundCustomer = customerRepository.findById(id);
 
-        // map data
-        // between model
-        // check typ array -> update.
-        // name
-        // convert -> list
-        // set list
+        if(resultFoundCustomer.isPresent()){
+            Customer prepateDataCustomer = this.mapDataRequestToModel(customerRequest, resultFoundCustomer.get()); // call function
+            Customer updatedCustomer = customerRepository.save(prepateDataCustomer);
+            return modelMapper.map(updatedCustomer,CustomerRespone.class);
+        }else{
+
+            Customer prepateDataCustomer = this.mapDataRequestToModel(customerRequest, new Customer()); // call function
+            prepateDataCustomer.setCreatedAt(LocalDateTime.now());
+            Customer updatedCustomer = customerRepository.save(prepateDataCustomer);
+            return modelMapper.map(updatedCustomer,CustomerRespone.class);
+        }
 
 
-        Customer updateCustomer = new Customer();
+    }
+    public Customer mapDataRequestToModel(CustomerRequest customerRequest, Customer dataCustomer){
 
-        log.info("Get data request");
-        log.info(customerRequest.toString());
+//        log.info("Get data request");
+//        log.info(customerRequest.toString());
         Field[] allFieldDataCustomer = customerRequest.getClass().getDeclaredFields();
+        Field attributeCustomer;
+//        log.info("Prepare handel data");
+//
+//        log.info("update model: handel data");
+        for (Field dataItem : allFieldDataCustomer) {
+            dataItem.setAccessible(true);
+            try {
+                if (dataItem.get(customerRequest) != null) {
+                    if (dataItem.getType() == List.class) { // check field is List?
+                        String fieldName = dataItem.getName();
+//                        log.info("=============================================" + dataItem.getType());
+//                        log.info("get class model: " + customerRequest.getClass());
+//                        log.info("field model: " + fieldName);
+                        Type genericType = dataItem.getGenericType();
+                        if (genericType instanceof ParameterizedType) { // get name model in list
+                            ParameterizedType parameterizedType = (ParameterizedType) genericType;
+                            Type[] typeArguments = parameterizedType.getActualTypeArguments();
 
-        Field itemOldCustomer;
-        log.info("Prepare handel data");
+                            if (typeArguments.length > 0) { // ensure list not null
+                                Type typeArgument = typeArguments[0];
+                                if (typeArgument instanceof Class) {
+                                    Class<?> modelClassRequest = (Class<?>) typeArgument;
+                                    String nameClassRequest = modelClassRequest.getSimpleName();
+//                                    log.info("get model in list: " + nameClassRequest);
+                                    String nameModelClass = nameClassRequest.substring(0, nameClassRequest.indexOf("Request"));
 
-            log.info("update model: handel data");
-            for (Field dataItem : allFieldDataCustomer) {
-                dataItem.setAccessible(true);
-                try {
-                    if (dataItem.get(customerRequest) != null) {
-                        if (dataItem.getType() == List.class) { // check field is List?
-                            String fieldName = dataItem.getName();
-                            log.info("=============================================" + dataItem.getType());
-                            log.info("get class model: " + customerRequest.getClass());
-                            log.info("field model: " + fieldName);
+                                    try {// convert list addresses request to list addresses model
+                                        Object modelInstance = Class.forName(environment.getProperty("spring.path.model") +"."+nameModelClass).getDeclaredConstructor().newInstance();
 
-                            Type genericType = dataItem.getGenericType();
+                                        List<?> itemDataList = (List<?>) dataItem.get(customerRequest);
+                                        List<?> resultList = itemDataList.stream()
+                                                .map(
+                                                        itemData -> modelMapper.map(itemData,modelInstance.getClass())
+                                                )
+                                                .collect(Collectors.toList());
 
-                            if (genericType instanceof ParameterizedType) { // get name model in list
-                                ParameterizedType parameterizedType = (ParameterizedType) genericType;
-                                Type[] typeArguments = parameterizedType.getActualTypeArguments();
+                                        attributeCustomer = dataCustomer.getClass().getDeclaredField("addresses");
+                                        attributeCustomer.setAccessible(true);
+                                        attributeCustomer.set(dataCustomer, resultList);
+                                    } catch (Exception e) {
 
-                                if (typeArguments.length > 0) { // ensure list not null
-                                    Type typeArgument = typeArguments[0];
-                                    if (typeArgument instanceof Class) {
-                                        Class<?> modelClassRequest = (Class<?>) typeArgument;
-                                        String nameClassRequest = modelClassRequest.getSimpleName();
-                                        log.info("get model in list: " + nameClassRequest);
-                                        String nameModelClass = nameClassRequest.substring(0, nameClassRequest.indexOf("Request"));
-
-                                        try {
-                                            // Use reflection to create an instance of the class based on modelName
-                                            Object modelInstance = Class.forName(environment.getProperty("spring.path.model") +"."+nameModelClass).getDeclaredConstructor().newInstance();
-
-                                            log.info("get model in list: " + nameModelClass);
-                                            log.info("Modal analy " + modelInstance.getClass() );
-                                            // Now, you have an instance of the "Address" class (assuming it exists).
-
-                                            // You can work with the modelInstance as needed.
-                                            // For example, you can set properties or invoke methods on it.
-                                        } catch (Exception e) {
-                                            // Handle exceptions, such as ClassNotFoundException or
-                                            // NoSuchMethodException if the class or constructor is not found.
-                                            e.printStackTrace();
-                                        }
+                                        e.printStackTrace();
                                     }
                                 }
                             }
-                            log.info("=============================================");
-
-                        } else {
-                            try {
-                                String fieldName = dataItem.getName();
-
-                                log.info("field model: " + fieldName);
-                                itemOldCustomer = updateCustomer.getClass().getDeclaredField(fieldName);
-                                itemOldCustomer.setAccessible(true);
-                                itemOldCustomer.set(updateCustomer, dataItem.get(customerRequest));
-                            } catch (NoSuchFieldException e) {}
-
                         }
+
+                        log.info("=============================================");
+
+                    } else {
+                        try {
+                            String fieldName = dataItem.getName();
+
+                            log.info("field model: " + fieldName);
+                            attributeCustomer = dataCustomer.getClass().getDeclaredField(fieldName);
+                            attributeCustomer.setAccessible(true);
+                            attributeCustomer.set(dataCustomer, dataItem.get(customerRequest));
+                        } catch (NoSuchFieldException e) {}
+
                     }
+                }
 
-                } catch (IllegalAccessException a) {}
-            }
+            } catch (IllegalAccessException a) {}
+        }
 
-//                itemOldCustomer= null;
 
-        log.info("Object after map:");
-        log.info(updateCustomer.toString());
 
-        return new CustomerRespone();
+        return dataCustomer;
 
 
     }
