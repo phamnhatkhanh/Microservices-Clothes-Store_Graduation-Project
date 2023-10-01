@@ -5,6 +5,8 @@ import lombok.*;
 
 @Data
 public class AddressRequest {
+    @JsonProperty("id")
+    private Long id;
     @JsonProperty("first_name")
     private String firstName;
     @JsonProperty("last_name")

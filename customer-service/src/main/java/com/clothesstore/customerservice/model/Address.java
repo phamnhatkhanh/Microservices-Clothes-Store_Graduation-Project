@@ -42,11 +42,13 @@ public class Address {
     private String countryCode;
     @Column(name = "country_name")
     private String countryName;
-    @CreationTimestamp
+
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
-    @LastModifiedDate
+
     @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -56,6 +58,16 @@ public class Address {
     @JsonIgnore // Infinite recursion when mapping object.
     private List<Customer> customers;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 
 }

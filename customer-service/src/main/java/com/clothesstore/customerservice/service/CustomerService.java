@@ -17,7 +17,6 @@ public interface CustomerService {
     CustomerRespone save(CustomerRequest customerRequest);
 
     CustomerRespone update(Long id, CustomerRequest customerRequest);
-    CustomerRespone updateTest(Long id, CustomerRequest customerRequest);
 
     void deleteById(Long id);
 

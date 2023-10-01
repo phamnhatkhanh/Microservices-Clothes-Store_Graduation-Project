@@ -35,11 +35,13 @@ public class Customer {
     private Integer ordersCount;
     @Column(name = "total_spent")
     private Float totalSpent;
-    @CreationTimestamp
+
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
-    @LastModifiedDate
+
     @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
     @ManyToMany(mappedBy = "customers", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -62,5 +64,15 @@ public class Customer {
                 '}';
     }
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 }
