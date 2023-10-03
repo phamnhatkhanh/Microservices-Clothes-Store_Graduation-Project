@@ -9,12 +9,12 @@ import java.util.List;
 
 @Service
 public interface CustomerService {
-    CustomerRespone findById(Long id);
-    List<CustomerRespone> all();
+    Customer findById(Long id);
+    List<Customer> all();
 
     CustomerRespone save(CustomerResquest customerResquest);
 
-    CustomerRespone update(Long id, CustomerResquest customerResquest);
+    Customer update(Long id, Customer customer);
 
     void deleteById(Long id);
 
