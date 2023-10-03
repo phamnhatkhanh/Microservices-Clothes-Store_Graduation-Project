@@ -3,17 +3,25 @@ Customer:
 - system: save data
 write api CRUD
 
-template: https://github.dev/osopromadze/Spring-Boot-Blog-REST-API/blob/main/src/main/java/com/sopromadze/blogapi/service/UserService.java
-mapper: https://modelmapper.org/user-manual/configuration/#matching-strategies
-    https://github.dev/ferhatclk/RentACar/blob/Main/src/main/java/com/kodlamaio/rentAcar/bussines/response/cars/GetByIdCarResponse.java
-    https://github.com/arey/java-object-mapper-benchmark/blob/master/src/main/java/com/javaetmoi/benchmark/mapping/mapper/jmapper/JMapperMapper.java
 
-- setup win:
-- hôm xong xuôi phần customer + tìm phần tạo token.
-- set up luôn keycloack:
+=== Mai
+Task:
+- service shopify - admin - customer: sync data from shopify to system/
+    1. Shopify: register webhoook
+    2. Api: sync all, list, id
+    3. Kafka: connect admin to customer.
+    4. Customer: receive data and save DB
+
+- Customer: set token.
+
+// in case: register new customer
+    Test: get customer -> SSO
+
+After i have done the task customer, i will move on product, order.
 
 
 
+=======
 
 1. System:
 - post:
@@ -40,10 +48,16 @@ Học k8 quản lý.
 Mowr rộng thêm.
 
 
-Admin:
-    Call api get all data
-        resolve problem paganani page.
-    Event -> save Customer database.
+=== Resource
+template: https://github.dev/osopromadze/Spring-Boot-Blog-REST-API/blob/main/src/main/java/com/sopromadze/blogapi/service/UserService.java
+mapper: https://modelmapper.org/user-manual/configuration/#matching-strategies
+    https://github.dev/ferhatclk/RentACar/blob/Main/src/main/java/com/kodlamaio/rentAcar/bussines/response/cars/GetByIdCarResponse.java
+    https://github.com/arey/java-object-mapper-benchmark/blob/master/src/main/java/com/javaetmoi/benchmark/mapping/mapper/jmapper/JMapperMapper.java
 
+- setup win:
+- hôm xong xuôi phần customer + tìm phần tạo token.
+- set up luôn keycloack:
 
-Morgin: done api CRUD and register webhook -> get data.
+Enum:
+- https://www.youtube.com/watch?v=wq9SJb8VeyM
+- https://github.com/shivkumar98/OCP-Java-Examples/blob/main/src/chapter_1/chapter_1_6_enums/README.md

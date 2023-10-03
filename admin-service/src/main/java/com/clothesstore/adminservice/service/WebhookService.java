@@ -4,7 +4,7 @@ import com.clothesstore.adminservice.model.Customer;
 
 import java.util.List;
 
-public interface CustomerService {
+public interface WebhookService {
     Customer getCustomerById(Long id);
     List<Customer> getCustomers();
 

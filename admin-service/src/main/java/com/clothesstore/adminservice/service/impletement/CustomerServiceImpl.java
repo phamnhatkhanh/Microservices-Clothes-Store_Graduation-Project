@@ -1,8 +1,5 @@
-package com.clothesstore.adminservice.service;
+package com.clothesstore.adminservice.service.impletement;
 
-import com.clothesstore.adminservice.dto.CustomerRespone;
-import com.clothesstore.adminservice.dto.CustomerResquest;
-import com.clothesstore.adminservice.model.Customer;
 import com.clothesstore.adminservice.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,10 +9,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +20,8 @@ public class CustomerServiceImpl {
     @Value("${shopify.access.token}")
     private String shopifyAcesstoken;
 
-    @Autowired
-    private final CustomerRepository customerRepository;
-    @Autowired
-    private Environment environment;
+
+    private final Environment environment;
     private final WebClient.Builder webClientBuilder;
 
 //

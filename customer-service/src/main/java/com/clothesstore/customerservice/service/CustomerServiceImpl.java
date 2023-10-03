@@ -5,19 +5,15 @@ import com.clothesstore.customerservice.dto.CustomerRespone;
 import com.clothesstore.customerservice.dto.CustomerRequest;
 import com.clothesstore.customerservice.model.Address;
 import com.clothesstore.customerservice.model.Customer;
-import com.clothesstore.customerservice.repository.AddressRepository;
 import com.clothesstore.customerservice.repository.CustomerRepository;
-import com.clothesstore.customerservice.utils.MapDataRequestToModel;
+import com.clothesstore.customerservice.utils.CustomerUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,8 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
     @Autowired
-    private MapDataRequestToModel mapDataRequestToModel;
-
+    private CustomerUtils customerUtils;
     @Autowired
     private ModelMapper modelMapper;
 
@@ -102,7 +97,7 @@ public class CustomerServiceImpl implements CustomerService {
         List<Customer> customerList = new ArrayList<>();
 
         if(resultFoundCustomer.isPresent()){
-            Customer prepateDataCustomer = mapDataRequestToModel.mapModel(customerRequest, resultFoundCustomer.get()); // call function
+            Customer prepateDataCustomer = customerUtils.mapModel(customerRequest, resultFoundCustomer.get()); // call function
             customerList.add(prepateDataCustomer);
             List<Address> addresses = prepateDataCustomer.getAddresses().stream()
                     .map(address -> modelMapper.map(address,Address.class))
@@ -114,7 +109,7 @@ public class CustomerServiceImpl implements CustomerService {
             return modelMapper.map(updatedCustomer,CustomerRespone.class);
         }else{
 
-            Customer prepateDataCustomer = mapDataRequestToModel.mapModel(customerRequest, new Customer()); // call function
+            Customer prepateDataCustomer = customerUtils.mapModel(customerRequest, new Customer()); // call function
             prepateDataCustomer.setId(id);
             customerList.add(prepateDataCustomer);
             List<Address> addresses = prepateDataCustomer.getAddresses().stream()

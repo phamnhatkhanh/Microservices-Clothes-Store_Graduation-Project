@@ -1,4 +1,4 @@
-package com.clothesstore.adminservice.dto;
+package com.clothesstore.adminservice.dto.respone;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

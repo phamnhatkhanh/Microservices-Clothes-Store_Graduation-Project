@@ -1,5 +1,6 @@
 package com.clothesstore.adminservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,18 +34,31 @@ public class Admin {
     private String password;
     private String phone;
     private String status;
-    @Column(name = "shpoify_domain")
     private String shopifyDomain;
-    @Column(name = "access_token")
     private String accessToken;
-    @Column(name = "address_id")
-    private Long addressId;
+    @Column(nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
-    @ManyToMany(mappedBy = "admins")
+
+    @ManyToMany(mappedBy = "admins", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Address> addresses;
 
-//    @Lob
-//    @Column(columnDefinition = "MEDIUMBLOB")
-//    private String image;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+
+
 }
