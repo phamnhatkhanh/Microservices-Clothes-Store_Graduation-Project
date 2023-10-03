@@ -1,5 +1,6 @@
 package com.clothesstore.customerservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +13,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "address")
+@Table(name = "address", uniqueConstraints = @UniqueConstraint(columnNames = {"phone"}))
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -50,6 +52,7 @@ public class Address {
     @JoinTable(name = "address_customer",
             joinColumns = @JoinColumn(name = "address_id"),
             inverseJoinColumns = @JoinColumn(name = "customer_id"))
+    @JsonIgnore // Infinite recursion when mapping object.
     private List<Customer> customers;
 
 
