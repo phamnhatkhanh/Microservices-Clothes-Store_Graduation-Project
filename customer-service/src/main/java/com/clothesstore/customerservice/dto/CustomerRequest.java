@@ -1,14 +1,12 @@
 package com.clothesstore.customerservice.dto;
 
-import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 @Data
-public class CustomerResquest {
+public class CustomerRequest {
 
     @JsonProperty("email")
     private String email;
@@ -27,7 +25,7 @@ public class CustomerResquest {
     @JsonProperty("total_spent")
     private Float totalSpent;
     @JsonProperty("addresses")
-    private List<AdressResquest> adressResquest;
+    private List<AddressRequest> addressRequest;
 
     // Constructors, getters, setters, and other methods as needed
 }

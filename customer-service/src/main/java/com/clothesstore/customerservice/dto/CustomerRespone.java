@@ -23,6 +23,7 @@ public class CustomerRespone {
     private String lastName;
     private Integer ordersCount;
     private Float totalSpent;
+    private String errorMessage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<Address> addresses;

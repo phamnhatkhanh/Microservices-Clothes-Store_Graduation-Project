@@ -1,5 +1,6 @@
 package com.clothesstore.adminservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "admin")
+@Table(name = "address")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,32 +21,58 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "customer_id")
-    private Long customer_id;
-    private String username;
-    private String email;
-    private String password;
-    private String phone;
-    private String status;
-    private String shopifyDomain;
-    private String accessToken;
-    private String address;
-    private String province;
+    @Column(name = "first_name")
+    private String firstName;
+    @Column(name = "last_name")
+    private String lastName;
+    private String address1;
+    private String address2;
     private String city;
+    private String province;
+    private String country;
     private String zip;
+    private String phone;
+    @Column(name = "province_code")
+    private String provinceCode;
+    @Column(name = "country_code")
+    private String countryCode;
+    @Column(name = "country_name")
     private String countryName;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "address_customer",
-            joinColumns = @JoinColumn(name = "address_id",referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "customer_id",referencedColumnName = "id"))
-    private List<Customer> customers;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "address_admin",
             joinColumns = @JoinColumn(name = "address_id",referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "admin_id",referencedColumnName = "id"))
+    @JsonIgnore
     private List<Admin> admins;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "address_customer",
+            joinColumns = @JoinColumn(name = "address_id"),
+            inverseJoinColumns = @JoinColumn(name = "customer_id"))
+    @JsonIgnore // Infinite recursion when mapping object.
+    private List<Customer> customers;
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+
+
+
 
 }

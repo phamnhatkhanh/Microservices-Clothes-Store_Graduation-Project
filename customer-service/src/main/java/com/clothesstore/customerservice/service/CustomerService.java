@@ -1,20 +1,22 @@
 package com.clothesstore.customerservice.service;
 
 import com.clothesstore.customerservice.dto.CustomerRespone;
-import com.clothesstore.customerservice.dto.CustomerResquest;
-import com.clothesstore.customerservice.model.Customer;
+import com.clothesstore.customerservice.dto.CustomerRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
 @Service
 public interface CustomerService {
-    Customer findById(Long id);
-    List<Customer> all();
+    CustomerRespone findById(Long id);
+    List<CustomerRespone> all();
 
-    CustomerRespone save(CustomerResquest customerResquest);
+    List<CustomerRespone> findAllById(@RequestParam List<Long> ids);
 
-    Customer update(Long id, Customer customer);
+    CustomerRespone save(CustomerRequest customerRequest);
+
+    CustomerRespone update(Long id, CustomerRequest customerRequest);
 
     void deleteById(Long id);
 

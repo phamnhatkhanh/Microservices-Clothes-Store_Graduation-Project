@@ -1,10 +1,12 @@
 package com.clothesstore.customerservice.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "address")
+//@Table(name = "address", uniqueConstraints = @UniqueConstraint(columnNames = {"phone"}))
 @Getter
 @Setter
 @NoArgsConstructor
@@ -39,19 +42,32 @@ public class Address {
     private String countryCode;
     @Column(name = "country_name")
     private String countryName;
-    @CreatedDate
+
     @Column(name = "created_at", nullable = false, updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
-    @LastModifiedDate
+
     @Column(name = "updated_at")
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(name = "address_customer",
             joinColumns = @JoinColumn(name = "address_id"),
             inverseJoinColumns = @JoinColumn(name = "customer_id"))
+    @JsonIgnore // Infinite recursion when mapping object.
     private List<Customer> customers;
 
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 
 
 }
