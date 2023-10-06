@@ -1,6 +1,5 @@
 package com.clothesstore.customerservice.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,7 +17,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 public class Customer {
 
     @Id
@@ -31,6 +29,7 @@ public class Customer {
     @Column(name = "access_token")
     private String accessToken;
     private String phone;
+    private String state;
     @Column(name = "orders_count")
     private Integer ordersCount;
     @Column(name = "total_spent")
@@ -44,25 +43,9 @@ public class Customer {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
     @ManyToMany(mappedBy = "customers", cascade = CascadeType.ALL)
-    @JsonIgnore
+//    @EqualsAndHashCode.Exclude
     private List<Address> addresses;
 
-    @Override
-    public String toString() {
-        return "Customer{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", accessToken='" + accessToken + '\'' +
-                ", phone='" + phone + '\'' +
-                ", ordersCount=" + ordersCount +
-                ", totalSpent=" + totalSpent +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                '}';
-    }
 
     @PrePersist
     protected void onCreate() {
