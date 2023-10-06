@@ -5,7 +5,7 @@ import com.clothesstore.customerservice.model.Customer;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -45,7 +45,7 @@ public class CustomerUtils {
                                     String nameModelClass = nameClassRequest.substring(0, nameClassRequest.indexOf("Request"));
 
                                     try {// convert list addresses request to list addresses model
-                                        Object modelInstance = Class.forName(environment.getProperty("spring.path.model") +"."+nameModelClass).getDeclaredConstructor().newInstance();
+                                        Object modelInstance = Class.forName(env.getProperty("spring.path.model") +"."+nameModelClass).getDeclaredConstructor().newInstance();
 
                                         List<?> itemDataList = (List<?>) dataItem.get(customerRequest);
                                         List<?> resultList = itemDataList.stream()
