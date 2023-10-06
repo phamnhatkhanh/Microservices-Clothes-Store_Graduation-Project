@@ -10,7 +10,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.json.JSONParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -25,12 +27,14 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ShopifyServiceImpl implements ShopifyService {
 
-    private final Environment environment;
+
+    @Autowired
+    private Environment env;
     private final WebClient.Builder webClientBuilder;
 
     @Override
     public String registerWebhookStore() {
-        String[] topicList = environment.getProperty(ShopifyEnvironment.TOPICS_PERMISSION.getValue()).split(",");
+        String[] topicList = env.getProperty(ShopifyEnvironment.TOPICS_PERMISSION.getValue()).split(",");
         Integer i = 0;
         System.out.println(topicList.length);
 
@@ -53,7 +57,7 @@ public class ShopifyServiceImpl implements ShopifyService {
 
     @Override
     public String deleteWebhookStore() {
-        String[] idWebhookList = environment.getProperty(ShopifyEnvironment.LIST_WEBHOOK.getValue()).split(",");
+        String[] idWebhookList = env.getProperty(ShopifyEnvironment.LIST_WEBHOOK.getValue()).split(",");
         Integer i = 0;
         System.out.println(idWebhookList.length);
 
@@ -75,19 +79,19 @@ public class ShopifyServiceImpl implements ShopifyService {
 
     public void createWebhook(String topic) {
 
-        webClientBuilder.baseUrl(environment.getProperty(ShopifyEnvironment.ROOT_LINK.getValue())).build();
+        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.ROOT_LINK.getValue())).build();
 
         String webhookUrl = "/webhooks.json";
         HttpHeaders headers = new HttpHeaders();
         headers.add(
-                environment.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
-                environment.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
         );
         headers.setContentType(MediaType.APPLICATION_JSON);
         log.info(headers.toString());
 
 
-        String addressWebhook = environment.getProperty(ShopifyEnvironment.ADDRESS_WEBHOOK.getValue());
+        String addressWebhook = env.getProperty(ShopifyEnvironment.ADDRESS_WEBHOOK.getValue());
         String requestBody = "{\"webhook\":{\"address\":\"" + addressWebhook + "\",\"topic\":" + topic + ",\"format\":\"json\"}}";
 
         Object object= new Object();
@@ -119,13 +123,13 @@ public class ShopifyServiceImpl implements ShopifyService {
 
     public void deleteWebhook(String idWebhook) {
 
-        webClientBuilder.baseUrl(environment.getProperty(ShopifyEnvironment.ROOT_LINK.getValue())).build();
+        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.ROOT_LINK.getValue())).build();
 
         String webhookUrl = "/webhooks/"+idWebhook+".json";
         HttpHeaders headers = new HttpHeaders();
         headers.add(
-                environment.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
-                environment.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
         );
 
 

@@ -5,12 +5,15 @@ package com.clothesstore.adminservice.enums;
 
 public enum ShopifyEnvironment {
     STORE_URL("shopify.domain.store"),
-    ROOT_LINK("shopify.api.root.link"),
+    ROOT_LINK("shopify.api.root"),
     ADDRESS_WEBHOOK("shopify.api.address.webhook"),
+    LIST_WEBHOOK("shopify.store.list.id.webhook"),
+    SERCRET_KEY("shopify.key.sercret"),
     ACCESS_TOKEN("shopify.access.token"),
     HEADER_TOKEN("shopify.header.token"),
-    TOPICS_PERMISSION("shopify.store.access.permission"),
-    LIST_WEBHOOK("shopify.store.list.id.webhook");
+    HEADER_HMAC("shopify.header.hmac"),
+    TOPICS_PERMISSION("shopify.store.access.permission");
+
 
 
 

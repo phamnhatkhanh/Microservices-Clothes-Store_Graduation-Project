@@ -1,21 +1,75 @@
 package com.clothesstore.adminservice.utils;
 
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
-import org.springframework.stereotype.Component;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Enumeration;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.util.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
-@Resource
+@Service
 public class ShopifyUtils {
-//    @Autowired
-//    private Environment environment;
-//
-//    @Autowired
-//    private final WebClient.Builder webClientBuilder;
 
+    public boolean verifyPostHMAC(HttpServletRequest request, String requestBodyString){
+        if(!isShopifyRequest(request)){
+            return false;
+        }
+
+        try {
+            // Get the HMAC header from the request
+            String hmacHeader = request.getHeader("x-shopify-hmac-sha256");
+
+
+            // Create an HMAC instance with the Shopify API secret
+            Mac hmacSha256 = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKeySpec = new SecretKeySpec("f31ddeff3b25e395bb72fd96526e75b7".getBytes(), "HmacSHA256");
+            hmacSha256.init(secretKeySpec);
+
+            // Calculate the HMAC hash from the request body
+            byte[] hashBytes = hmacSha256.doFinal(requestBodyString.getBytes(StandardCharsets.UTF_8));
+            String calculatedHash = Base64.getEncoder().encodeToString(hashBytes);
+            System.out.println("HMAC get header");
+            System.out.println(hmacHeader);
+            // Compare the calculated hash with the HMAC header
+            if (calculatedHash.equals(hmacHeader)) {
+                System.out.println("HMAC success");
+                System.out.println(hmacHeader);
+                return true;
+
+            } else {
+                System.out.println("HMAC failed");
+                return false;
+            }
+        } catch (NoSuchAlgorithmException | InvalidKeyException e ) {
+            System.out.println("Error in HMAC validation");
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean isShopifyRequest(HttpServletRequest request) {
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
+            String headerName = headerNames.nextElement().toLowerCase();
+            if (headerName.equals("x-shopify-hmac-sha256".toLowerCase())) {
+
+                return true;
+            }
+        }
+        return false;
+    }
 }
+
 /*
 
 public static function countDataCustomer($shop, $accessToken)

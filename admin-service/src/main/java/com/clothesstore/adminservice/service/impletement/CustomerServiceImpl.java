@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class CustomerServiceImpl {
     private String shopifyAcesstoken;
 
 
-    private final Environment environment;
+
     private final WebClient.Builder webClientBuilder;
 
 //
@@ -50,23 +50,23 @@ public class CustomerServiceImpl {
 
     
 
-    public ResponseEntity<Object> isInStock() {
-        log.info("Start prepare {}");
-
-        Object entities = webClientBuilder.build().get()
-                .uri(shopifyDomain+"/admin/api/2023-04/customers.json",
-                        uriBuilder -> uriBuilder.queryParam("ids", "5638817939665").build())
-                .headers(
-                        httpHeaders -> {
-                            httpHeaders.set(environment.getProperty("shopify.header.token"), shopifyAcesstoken);
-
-                        })
-
-                .retrieve()
-                .bodyToMono(Object.class)
-                .block();
-
-        return new ResponseEntity<Object>(entities, HttpStatus.OK);
-    }
+//    public ResponseEntity<Object> isInStock() {
+//        log.info("Start prepare {}");
+//
+//        Object entities = webClientBuilder.build().get()
+//                .uri(shopifyDomain+"/admin/api/2023-04/customers.json",
+//                        uriBuilder -> uriBuilder.queryParam("ids", "5638817939665").build())
+//                .headers(
+//                        httpHeaders -> {
+//                            httpHeaders.set(env.getProperty("shopify.header.token"), shopifyAcesstoken);
+//
+//                        })
+//
+//                .retrieve()
+//                .bodyToMono(Object.class)
+//                .block();
+//
+//        return new ResponseEntity<Object>(entities, HttpStatus.OK);
+//    }
 
 }
