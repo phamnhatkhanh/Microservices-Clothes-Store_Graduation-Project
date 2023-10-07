@@ -1,38 +1,34 @@
 package com.clothesstore.adminservice.dto.respone;
 
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.clothesstore.adminservice.model.Address;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.Data;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
-@Entity
-@Table(name = "admin")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@ToString
 public class CustomerRespone {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
     private String username;
     private String email;
     private String password;
     private String phone;
-    private String status;
-    private String shopifyDomain;
-    private String accessToken;
-    private String address;
-    private String province;
-    private String city;
-    private String zip;
-    private String countryName;
+    private String state;
+    private String firstName;
+    private String lastName;
+    private Integer ordersCount;
+    private Float totalSpent;
+    private String errorMessage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<Address> addresses;
 
 
 }

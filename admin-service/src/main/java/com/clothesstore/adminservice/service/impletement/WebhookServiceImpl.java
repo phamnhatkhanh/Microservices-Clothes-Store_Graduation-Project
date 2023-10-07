@@ -1,6 +1,7 @@
 package com.clothesstore.adminservice.service.impletement;
 
 import com.clothesstore.adminservice.repository.CustomerRepository;
+import com.clothesstore.adminservice.service.WebhookService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class WebhookServiceImpl {
+public class WebhookServiceImpl implements WebhookService {
     @Value("${shopify.domain.store}")
     private String shopifyDomain;
     @Value("${shopify.access.token}")
@@ -26,8 +27,8 @@ public class WebhookServiceImpl {
     private final WebClient.Builder webClientBuilder;
 
 
-    
+    @Override
+    public void sendWebhookToService(String topic) {
 
-
-
+    }
 }

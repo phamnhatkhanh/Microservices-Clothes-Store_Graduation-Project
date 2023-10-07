@@ -1,31 +1,54 @@
 package com.clothesstore.adminservice.utils;
 
-import jakarta.annotation.Resource;
+import com.clothesstore.adminservice.dto.respone.CustomerCount;
+import com.clothesstore.adminservice.dto.respone.ProductCount;
+import com.clothesstore.adminservice.enums.ShopifyEnvironment;
 
+import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.core.env.Environment;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Service;
+
+
+
+import reactor.core.publisher.Mono;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class ShopifyUtils {
+    @Autowired
+    private Environment env;
+    @Autowired
+    private  WebClient.Builder webClientBuilder;
+    @Autowired
+    private ModelMapper modelMapper;
+    private static final Integer CUSTOMER_COUNT_ERROR = -1;
+    private static final Integer PRODUCT_COUNT_ERROR = -1;
+
 
     public boolean verifyPostHMAC(HttpServletRequest request, String requestBodyString){
         if(!isShopifyRequest(request)){
             return false;
         }
-
         try {
             // Get the HMAC header from the request
             String hmacHeader = request.getHeader("x-shopify-hmac-sha256");
@@ -62,65 +85,155 @@ public class ShopifyUtils {
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement().toLowerCase();
             if (headerName.equals("x-shopify-hmac-sha256".toLowerCase())) {
-
                 return true;
             }
         }
         return false;
     }
-}
 
-/*
-
-public static function countDataCustomer($shop, $accessToken)
-{
-fe
-    $client = new Client();
-    $url = 'https://' . $shop . '/admin/api/2022-07/customers/count.json';
-    $request = $client->request('get', $url, [
-            'headers' => [
-            'X-Shopify-Access-Token' => $accessToken,
-            ]
-        ]);
-    $countCustomer = (array)json_decode($request->getBody());
-
-    return $countCustomer;
-}
-
-
-    public static function setParam(array $headers, $params)
+    public Integer  countDataCustomer()
     {
-        $links = explode(',', @$headers['Link'][0]);
-        $nextPage = $prevPage = null;
-        foreach ($links as $link) {
-        if (strpos($link, 'rel="next"')) {
-            $nextPage = $link;
+        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
+
+        String url = "/customers/count.json";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+        );
+
+
+        try{
+            Mono<Integer> quatityCustomer = webClientBuilder.build().get()
+                    .uri(url)
+                    .headers(httpHeaders -> httpHeaders.addAll(headers))
+                    .retrieve().bodyToMono(CustomerCount.class)
+                    .map(CustomerCount::getCount);
+            return  quatityCustomer.block();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return CUSTOMER_COUNT_ERROR;
         }
-        if (strpos($link, 'rel="previous"')) {
-            $prevPage = $link;
+
+    }
+    public Integer  countDataProduct()
+    {
+        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
+
+        String url = "/products/count.json";
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+        );
+
+        try{
+            Mono<Integer> quatityProducts = webClientBuilder.build().get()
+                    .uri(url)
+                    .headers(httpHeaders -> httpHeaders.addAll(headers))
+                    .retrieve().bodyToMono(ProductCount.class)
+                    .map(ProductCount::getCount);
+            return  quatityProducts.block();
+
+        }catch (Exception e){
+            e.printStackTrace();
+            return PRODUCT_COUNT_ERROR;
         }
+
     }
 
-        $params = [];
 
-        if ($nextPage) {
-            preg_match('~<(.*?)>~', $nextPage, $next);
-            $urlComponents = parse_url($next[1]);
-            parse_str($urlComponents['query'], $parseStr);
-            $params = $parseStr;
-            $params['next_cursor'] = $parseStr['page_info'];
+    public boolean matchNextPageUrlShopify(String linkUrl) {
+        String urlPattern = "<(https://[^>]+)>; rel=\"next\"";
+        Pattern pattern = Pattern.compile(urlPattern);
+        Matcher matcher = pattern.matcher(linkUrl);
+
+        // Find the first match and extract the "next" URL.
+        if (matcher.find()) {
+            return true;
+        } else {
+            return false;
         }
 
-        if ($prevPage) {
-            preg_match('~<(.*?)>~', $prevPage, $next);
-            $urlComponents = parse_url($next[1]);
-            parse_str($urlComponents['query'], $parseStr);
-            $params = !empty($params) ? $params : $parseStr;
-            $params['prev_cursor'] = $parseStr['page_info'];
+
+    }
+    public String extractNextPageLink(List<String> linkUrlList) {
+        for (String linkUrl:
+             linkUrlList) {
+            if (this.matchNextPageUrlShopify(linkUrl)){
+                String linkNextPage = linkUrl.replaceAll("<|>; rel=\"next\"", "");
+                System.out.println("Cleaned Next URL: " + linkNextPage);
+                return linkNextPage;
+            }
+
         }
 
-        return $params;
+        System.out.println("No 'next' URL found.");
+        return "";
+
+    }
+
+    public String fetchDataShopify(HttpHeaders headers,String url,int quantity, int limit){
+        int ceilRequest = (int) Math.ceil(quantity / (double) limit);
+
+        // Calculate the number of iterations to save all customers to the DB
+        int numberRequest = quantity > limit ? ceilRequest : 1;
+
+        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
+
+        try{
+            UriComponentsBuilder uriBuilder = UriComponentsBuilder
+                    .fromUriString(url)
+                    .queryParam("limit",limit);
+
+
+            for (int currentPage = 0; currentPage <= numberRequest; currentPage++) {
+                Mono<String> responseMono =
+                        webClientBuilder.build()
+                        .get()
+                        .uri(uriBuilder.build().toUri().toString())
+                        .headers(httpHeaders -> httpHeaders.addAll(headers))
+                        .exchange()
+                        .flatMap(response -> {
+                            HttpHeaders headersResponse = response.headers().asHttpHeaders();
+                            List<String> linkHeaders = headersResponse.get("Link");
+
+                            if (linkHeaders != null && !linkHeaders.isEmpty()) {
+                                String linkNextPage = this.extractNextPageLink(linkHeaders);
+
+                                log.info("next link page in shopify");
+                                log.info(linkNextPage);
+
+                                // Update the URI builder for the next iteration
+                                uriBuilder.replacePath(linkNextPage);
+                                return response.bodyToMono(String.class);
+                            }
+                            return response.bodyToMono(String.class);
+                        });
+
+                responseMono.subscribe(
+                        response -> {
+                            try{
+                                FileWriter fileWriter = new FileWriter("/Users/khanhpn/Desktop/Graduation-Project/Clothes-Store/response.txt");
+                                fileWriter.write(response);
+                                fileWriter.close();
+                            }catch(IOException e){
+                                e.printStackTrace();
+                            }
+
+                            System.err.println("Error occurred: " + response);
+                        },
+                        error -> {
+                            // Handle any errors
+                            System.err.println("Error occurred: " + error.getMessage());
+                        }
+                );
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return "";
     }
 }
-*
-*/
+

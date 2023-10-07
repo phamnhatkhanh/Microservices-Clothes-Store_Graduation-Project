@@ -35,6 +35,9 @@ public class Customer {
     @Column(name = "total_spent")
     private Float totalSpent;
 
+    @Column (nullable = false,columnDefinition = "varchar(255) default 'ROLE_CUSTOMER'")
+    private String role;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;

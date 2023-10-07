@@ -1,26 +1,27 @@
 package com.clothesstore.adminservice.service.impletement;
 
-import com.clothesstore.adminservice.dto.WebhookRequest;
+
 import com.clothesstore.adminservice.enums.ShopifyEnvironment;
 import com.clothesstore.adminservice.service.ShopifyService;
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.clothesstore.adminservice.utils.ShopifyUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +31,44 @@ public class ShopifyServiceImpl implements ShopifyService {
 
     @Autowired
     private Environment env;
-    private final WebClient.Builder webClientBuilder;
+    
+    @Autowired
+    private WebClient.Builder webClientBuilder;
+
+    @Autowired
+    private ShopifyUtils shopifyUtils;
+
+    @Override
+    public void syncCustomersFromShopify() {
+        int limit = 100;
+
+        // Count number of Customers
+        int countCustomer = shopifyUtils.countDataCustomer();
+      
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+        );
+
+        shopifyUtils.fetchDataShopify(headers,"/customers.json",countCustomer,limit);
+    }
+    @Override
+    public void syncProductsFromShopify() {
+        int limit = 100;
+
+        // Count number of Customers
+        int countProducts = shopifyUtils.countDataProduct();
+        int ceilRequest = (int) Math.ceil(countProducts / (double) limit);
+        int numberRequest = countProducts > limit ? ceilRequest : 1;
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+        );
+        shopifyUtils.fetchDataShopify(headers,"/products.json",countProducts,limit);
+
+    }
 
     @Override
     public String registerWebhookStore() {
@@ -79,7 +117,7 @@ public class ShopifyServiceImpl implements ShopifyService {
 
     public void createWebhook(String topic) {
 
-        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.ROOT_LINK.getValue())).build();
+        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
 
         String webhookUrl = "/webhooks.json";
         HttpHeaders headers = new HttpHeaders();
@@ -94,7 +132,6 @@ public class ShopifyServiceImpl implements ShopifyService {
         String addressWebhook = env.getProperty(ShopifyEnvironment.ADDRESS_WEBHOOK.getValue());
         String requestBody = "{\"webhook\":{\"address\":\"" + addressWebhook + "\",\"topic\":" + topic + ",\"format\":\"json\"}}";
 
-        Object object= new Object();
         try{
 
             Mono<String> responseMono = webClientBuilder.build().post()
@@ -123,7 +160,7 @@ public class ShopifyServiceImpl implements ShopifyService {
 
     public void deleteWebhook(String idWebhook) {
 
-        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.ROOT_LINK.getValue())).build();
+        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
 
         String webhookUrl = "/webhooks/"+idWebhook+".json";
         HttpHeaders headers = new HttpHeaders();

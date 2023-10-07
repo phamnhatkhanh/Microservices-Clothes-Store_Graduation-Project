@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
@@ -18,7 +19,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class CustomerUtils {
     @Autowired
-    private Environment environment;
+    private Environment env;
     @Autowired
     private ModelMapper modelMapper;
 
