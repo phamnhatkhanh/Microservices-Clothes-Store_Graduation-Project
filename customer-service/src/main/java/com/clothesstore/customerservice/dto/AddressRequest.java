@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Data
+@ToString
 public class AddressRequest {
     @JsonProperty("id")
     private Long id;

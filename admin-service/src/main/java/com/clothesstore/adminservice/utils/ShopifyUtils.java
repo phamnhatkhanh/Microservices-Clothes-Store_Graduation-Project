@@ -1,7 +1,7 @@
 package com.clothesstore.adminservice.utils;
 
-import com.clothesstore.adminservice.dto.respone.CustomerCount;
-import com.clothesstore.adminservice.dto.respone.ProductCount;
+import com.clothesstore.adminservice.dto.respone.CustomerCountDTO;
+import com.clothesstore.adminservice.dto.respone.ProductCountDTO;
 import com.clothesstore.adminservice.enums.ShopifyEnvironment;
 
 import java.io.FileWriter;
@@ -107,8 +107,8 @@ public class ShopifyUtils {
             Mono<Integer> quatityCustomer = webClientBuilder.build().get()
                     .uri(url)
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
-                    .retrieve().bodyToMono(CustomerCount.class)
-                    .map(CustomerCount::getCount);
+                    .retrieve().bodyToMono(CustomerCountDTO.class)
+                    .map(CustomerCountDTO::getCount);
             return  quatityCustomer.block();
 
         }catch (Exception e){
@@ -132,8 +132,8 @@ public class ShopifyUtils {
             Mono<Integer> quatityProducts = webClientBuilder.build().get()
                     .uri(url)
                     .headers(httpHeaders -> httpHeaders.addAll(headers))
-                    .retrieve().bodyToMono(ProductCount.class)
-                    .map(ProductCount::getCount);
+                    .retrieve().bodyToMono(ProductCountDTO.class)
+                    .map(ProductCountDTO::getCount);
             return  quatityProducts.block();
 
         }catch (Exception e){

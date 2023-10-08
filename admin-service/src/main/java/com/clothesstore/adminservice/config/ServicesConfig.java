@@ -21,6 +21,7 @@ import java.util.HashMap;
 @Configuration
 public class ServicesConfig {
     @Bean
+    @LoadBalanced
     public WebClient.Builder webClientBuilder() {
         final int size = 10*1024 * 1024;
         final ExchangeStrategies strategies = ExchangeStrategies.builder()
@@ -31,12 +32,10 @@ public class ServicesConfig {
         return WebClient.builder().exchangeStrategies(strategies);
     }
 
-//    @Bean
-//    public WebClient webClient() {
-//
-//        return WebClient.builder()
-//
-//    }
+    @Bean
+    WebClient webClient(WebClient.Builder builder) {
+        return builder.build();
+    }
 
 
     @Bean
@@ -47,18 +46,5 @@ public class ServicesConfig {
         return modelMapper;
     }
 
-//    @Bean
-//    public Environment environment() {
-//        return new Environment();
-//    }
-//    @Configuration
-//    public class WebClientConfig {
-//
-//        @Bean
-//        @LoadBalanced
-//        public WebClient.Builder webClientBuilder() {
-//            return WebClient.builder();
-//        }
-//    }
 
 }

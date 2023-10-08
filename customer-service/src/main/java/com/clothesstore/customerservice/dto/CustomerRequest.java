@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 @Data
+@ToString
 public class CustomerRequest {
 
     @JsonProperty("email")
