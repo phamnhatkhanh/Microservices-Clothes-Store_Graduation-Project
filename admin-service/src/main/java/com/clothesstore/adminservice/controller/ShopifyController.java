@@ -2,6 +2,7 @@
 package com.clothesstore.adminservice.controller;
 
 import com.clothesstore.adminservice.service.ShopifyService;
+import com.clothesstore.adminservice.service.WebhookService;
 import com.clothesstore.adminservice.utils.ShopifyUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,8 +33,18 @@ public class ShopifyController {
     @Autowired
     private ShopifyService shopifyService;
     @Autowired
+    private WebhookService webhookService;
+    @Autowired
     private ShopifyUtils shopifyUtils;
+    @GetMapping("/products")
+    public void syncProductsFromShopify(){
+        shopifyService.syncProductsFromShopify();
 
+    }
+    @GetMapping("/customers")
+    public void syncCustomersFromShopify(){
+        shopifyService.syncCustomersFromShopify();
+    }
     @GetMapping("/register-webhook")
     public String registerWebhook(){
         return  shopifyService.registerWebhookStore();
@@ -45,12 +56,29 @@ public class ShopifyController {
 
     }
     @PostMapping( "/webhooks")
-    public ResponseEntity<String> receivedCustomerCreatedWebhook(@RequestBody String webhookData, HttpServletRequest request) {
+    public ResponseEntity<String> receivedWebhookFromShopify(@RequestBody String webhookData, HttpServletRequest request) {
 
+        /*
+         -1. switch webhook
+        0. setting up kafka vs services.
+
+        -2. recived data.
+        3. send event to customer
+        4. Customer: recieve event
+        5. Save data
+        6. add key cloack
+
+        xem github -> paste code vaof.
+        * */
         if (shopifyUtils.verifyPostHMAC(request,webhookData)) {
+
+            webhookService.sendWebhookToService("toic");
             log.info("verifyWebhook validation is true and request is from shopify" );
             log.info(webhookData.toString());
-                return ResponseEntity.ok("validate sucess request from webhook");
+            shopifyUtils.countDataCustomer();
+//            System.out.println(String.valueOf());
+
+            return ResponseEntity.ok("validate sucess request from webhook");
 
         }else {
             log.info("verifyWebhook not request from shopify" );

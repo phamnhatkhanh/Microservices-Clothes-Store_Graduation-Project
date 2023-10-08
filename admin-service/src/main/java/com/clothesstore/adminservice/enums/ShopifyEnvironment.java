@@ -5,7 +5,7 @@ package com.clothesstore.adminservice.enums;
 
 public enum ShopifyEnvironment {
     STORE_URL("shopify.domain.store"),
-    ROOT_LINK("shopify.api.root"),
+    API_LINK("shopify.api.root"),
     ADDRESS_WEBHOOK("shopify.api.address.webhook"),
     LIST_WEBHOOK("shopify.store.list.id.webhook"),
     SERCRET_KEY("shopify.key.sercret"),

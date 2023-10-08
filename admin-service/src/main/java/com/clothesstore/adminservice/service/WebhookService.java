@@ -6,14 +6,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 @Service
 public interface WebhookService {
-    Customer getCustomerById(Long id);
-    List<Customer> getCustomers();
-
-    Customer addCustomer(Customer customer);
-
-    Customer updateCustomer(Long id, Customer customer);
-
-    Customer deleteCustomerById(Long id);
+    void sendWebhookToService(String topic);
 
     
 }
