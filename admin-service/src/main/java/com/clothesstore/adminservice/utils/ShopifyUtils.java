@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Mac;
@@ -20,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.core.env.Environment;
@@ -39,6 +42,8 @@ public class ShopifyUtils {
     private Environment env;
     @Autowired
     private  WebClient.Builder webClientBuilder;
+    @Autowired
+    private KafkaTemplate<String,String> kafkaTemplate;
     @Autowired
     private ModelMapper modelMapper;
     private static final Integer CUSTOMER_COUNT_ERROR = -1;
@@ -182,6 +187,7 @@ public class ShopifyUtils {
 
         webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
 
+
         try{
             UriComponentsBuilder uriBuilder = UriComponentsBuilder
                     .fromUriString(url)
@@ -222,7 +228,9 @@ public class ShopifyUtils {
                                 e.printStackTrace();
                             }
 
-                            System.err.println("Error occurred: " + response);
+                            this.sendEvent("data from shpoify send to service registered");
+//                            this.sendEvent(response);
+//                            System.err.println("Error occurred: " + response);
                         },
                         error -> {
                             // Handle any errors
@@ -234,6 +242,24 @@ public class ShopifyUtils {
             e.printStackTrace();
         }
         return "";
+    }
+    public void sendEvent(String customer){
+        try {
+            CompletableFuture<SendResult<String,String>> future = kafkaTemplate.send("customer-topic", customer);
+//            CompletableFuture<SendResult<String,Object>> future = kafkaTemplate.send("customer-topic", product);
+            future.whenComplete((result, ex) ->{
+                if (ex == null) {
+                    System.out.println("Sent message=[" + customer.toString() +
+                            "] with offset=[" + result.getRecordMetadata().offset() + "]");
+                } else {
+                    System.out.println("Unable to send message=[" +
+                            customer.toString() + "] due to : " + ex.getMessage());
+                }
+            });
+
+        } catch (Exception ex) {
+            System.out.println("ERROR : "+ ex.getMessage());
+        }
     }
 }
 

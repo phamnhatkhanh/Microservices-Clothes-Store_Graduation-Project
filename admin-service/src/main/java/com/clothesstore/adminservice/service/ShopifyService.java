@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono;
 public interface ShopifyService {
     // register webhook
     //
+
     void syncProductsFromShopify();
     void syncCustomersFromShopify();
     String registerWebhookStore();
