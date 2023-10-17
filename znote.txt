@@ -1,23 +1,31 @@
-Customer:
-- Admin: call api get all data
-- system: save data
-write api CRUD
+
+- set keycloack -> session
+- sync data all data.
 
 
 === Mai
 Task:
 - service shopify - admin - customer: sync data from shopify to system/
-    1. Shopify: register webhoook
-    2. Api: sync all, list, id
+    -1. Shopify: register webhoook
+    -2. Api: sync all, list, id
+    -2.1 get all data from shopify
     3. Kafka: connect admin to customer.
-    4. Customer: receive data and save DB
+        - connect
+        send event object
+        spring batch: break  data.
+
+
+    4. Customer: receive data and save DB: sử dụng spring boojot
+
+
+the same Product:
+    --> build UI: call get data.
+
 
 - Customer: set token.
 
 // in case: register new customer
     Test: get customer -> SSO
-
-After i have done the task customer, i will move on product, order.
 
 
 

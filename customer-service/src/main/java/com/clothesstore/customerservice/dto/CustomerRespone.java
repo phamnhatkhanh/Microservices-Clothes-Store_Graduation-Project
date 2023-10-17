@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@ToString
 public class CustomerRespone {
 
     @Id

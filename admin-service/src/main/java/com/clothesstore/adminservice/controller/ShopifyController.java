@@ -1,28 +1,21 @@
 
 package com.clothesstore.adminservice.controller;
 
+import com.clothesstore.adminservice.dto.CustomerDTO;
 import com.clothesstore.adminservice.service.ShopifyService;
 import com.clothesstore.adminservice.service.WebhookService;
 import com.clothesstore.adminservice.utils.ShopifyUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.codec.Hex;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.IOException;
-import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-
-import static javax.xml.crypto.dsig.SignatureMethod.HMAC_SHA256;
+import java.time.LocalDateTime;
+import java.util.concurrent.CompletableFuture;
 
 
 @Slf4j
@@ -36,6 +29,48 @@ public class ShopifyController {
     private WebhookService webhookService;
     @Autowired
     private ShopifyUtils shopifyUtils;
+
+    @Autowired
+    private KafkaTemplate<String,Object> kafkaTemplate;
+    @GetMapping("/test")
+    public void test(){
+        CustomerDTO customer = new CustomerDTO(
+                "john_doe",
+                "john.doe@example.com",
+                "password123",
+                "123-456-7890",
+                "CA",
+                "John",
+                "Doe",
+                3,
+                100.50f,
+                "No errors",
+                LocalDateTime.now(),
+                LocalDateTime.now()
+        );
+
+        try {
+            CompletableFuture<SendResult<String,Object>> future = kafkaTemplate.send("customer-topic", customer);
+            future.whenComplete((result, ex) ->{
+                if (ex == null) {
+                    System.out.println("Sent message=[" + customer.toString() +
+                            "] with offset=[" + result.getRecordMetadata().offset() + "]");
+                } else {
+                    System.out.println("Unable to send message=[" +
+                            customer.toString() + "] due to : " + ex.getMessage());
+                }
+            });
+
+        } catch (Exception ex) {
+            System.out.println("ERROR : "+ ex.getMessage());
+        }
+
+
+
+
+
+
+    }
     @GetMapping("/products")
     public void syncProductsFromShopify(){
         shopifyService.syncProductsFromShopify();
