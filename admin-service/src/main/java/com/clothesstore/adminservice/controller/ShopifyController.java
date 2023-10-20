@@ -1,7 +1,8 @@
 
 package com.clothesstore.adminservice.controller;
 
-import com.clothesstore.adminservice.dto.CustomerDTO;
+import com.clothesstore.adminservice.dto.respone.CustomerDTO;
+import com.clothesstore.adminservice.dto.respone.ProductDTO;
 import com.clothesstore.adminservice.service.ShopifyService;
 import com.clothesstore.adminservice.service.WebhookService;
 import com.clothesstore.adminservice.utils.ShopifyUtils;
@@ -30,42 +31,9 @@ public class ShopifyController {
     @Autowired
     private ShopifyUtils shopifyUtils;
 
-    @Autowired
-    private KafkaTemplate<String,Object> kafkaTemplate;
+
     @GetMapping("/test")
     public void test(){
-        CustomerDTO customer = new CustomerDTO(
-                "john_doe",
-                "john.doe@example.com",
-                "password123",
-                "123-456-7890",
-                "CA",
-                "John",
-                "Doe",
-                3,
-                100.50f,
-                "No errors",
-                LocalDateTime.now(),
-                LocalDateTime.now()
-        );
-
-        try {
-            CompletableFuture<SendResult<String,Object>> future = kafkaTemplate.send("customer-topic", customer);
-            future.whenComplete((result, ex) ->{
-                if (ex == null) {
-                    System.out.println("Sent message=[" + customer.toString() +
-                            "] with offset=[" + result.getRecordMetadata().offset() + "]");
-                } else {
-                    System.out.println("Unable to send message=[" +
-                            customer.toString() + "] due to : " + ex.getMessage());
-                }
-            });
-
-        } catch (Exception ex) {
-            System.out.println("ERROR : "+ ex.getMessage());
-        }
-
-
 
 
 
@@ -94,16 +62,9 @@ public class ShopifyController {
     public ResponseEntity<String> receivedWebhookFromShopify(@RequestBody String webhookData, HttpServletRequest request) {
 
         /*
-         -1. switch webhook
-        0. setting up kafka vs services.
+        - get webhook.
+        - send event -> listesn -> chuyển cho kafka.
 
-        -2. recived data.
-        3. send event to customer
-        4. Customer: recieve event
-        5. Save data
-        6. add key cloack
-
-        xem github -> paste code vaof.
         * */
         if (shopifyUtils.verifyPostHMAC(request,webhookData)) {
 

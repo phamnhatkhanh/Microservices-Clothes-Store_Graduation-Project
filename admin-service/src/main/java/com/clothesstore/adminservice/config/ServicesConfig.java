@@ -37,7 +37,6 @@ public class ServicesConfig {
         return builder.build();
     }
 
-
     @Bean
     public ModelMapper modelMapper() {
         ModelMapper modelMapper = new ModelMapper();

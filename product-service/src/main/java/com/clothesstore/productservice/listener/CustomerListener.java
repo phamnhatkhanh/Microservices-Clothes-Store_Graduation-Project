@@ -1,6 +1,5 @@
-package com.clothesstore.customerservice.listener;
+package com.clothesstore.productservice.listener;
 
-import com.clothesstore.customerservice.dto.CustomerDTO;
 import org.springframework.kafka.annotation.KafkaListener;
 
 public class CustomerListener {

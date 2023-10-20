@@ -1,8 +1,10 @@
 
 - set keycloack -> session
 - sync data all data.
-
-
+Shopify-> gửi json
+Admin -> lọc webhook
+    -> gửi json đúng với service
+        -> mỗi service tự xử lý data.
 === Mai
 Task:
 - service shopify - admin - customer: sync data from shopify to system/

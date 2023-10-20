@@ -1,19 +1,19 @@
-package com.clothesstore.adminservice.dto.respone;
+package com.clothesstore.productservice.dto;
 
-import com.clothesstore.adminservice.model.Address;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 
+import java.awt.desktop.AppEvent;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @ToString
-@AllArgsConstructor
-public class ProductDTO {
-//    private Long id;
-private String username;
+//@AllArgsConstructor
+//@NoArgsConstructor
+public class CustomerDTO {
+    private Long id;
+    private String username;
     private String email;
     private String password;
     private String phone;

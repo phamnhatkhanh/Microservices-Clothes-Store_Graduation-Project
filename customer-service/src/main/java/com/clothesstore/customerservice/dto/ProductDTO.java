@@ -1,6 +1,5 @@
-package com.clothesstore.adminservice.dto;
+package com.clothesstore.customerservice.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
 
@@ -8,10 +7,10 @@ import java.time.LocalDateTime;
 
 @Data
 @ToString
-@AllArgsConstructor
+//@AllArgsConstructor
 //@NoArgsConstructor
-public class CustomerDTO {
-//    private Long id;
+public class ProductDTO {
+    private Long id;
     private String username;
     private String email;
     private String password;
