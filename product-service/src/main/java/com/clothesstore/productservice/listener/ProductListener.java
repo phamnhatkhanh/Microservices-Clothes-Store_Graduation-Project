@@ -16,7 +16,7 @@ public class ProductListener {
     ProductRepository productRepository;
     @Autowired
     ModelMapper modelMapper;
-    @KafkaListener(id = "listener2", topics = "sync-products-shopify",groupId = "ecommerce_group_id")
+    @KafkaListener( topics = "sync-products-shopify",groupId = "ecommerce_group_id")
     public void receiveMessageFromAdmin(String productDtoJson) {
         ObjectMapper objectMapper = new ObjectMapper();
 
@@ -25,7 +25,7 @@ public class ProductListener {
             Product dataProduct = modelMapper.map(productDTO,Product.class);
 
             productRepository.save(dataProduct);
-            System.out.println("Received message from Admin: " + productDTO.getId());
+            System.out.println("Received Product Id: " + productDTO.getId());
         } catch (Exception e) {
             e.printStackTrace();
         }

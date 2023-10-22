@@ -1,9 +1,6 @@
 package com.clothesstore.adminservice.utils;
 
-import com.clothesstore.adminservice.dto.respone.CustomerCountDTO;
-import com.clothesstore.adminservice.dto.respone.ProductCountDTO;
-import com.clothesstore.adminservice.dto.respone.ProductDTO;
-import com.clothesstore.adminservice.dto.respone.ProductDTOList;
+import com.clothesstore.adminservice.dto.respone.*;
 import com.clothesstore.adminservice.enums.ShopifyEnvironment;
 
 import java.io.FileWriter;
@@ -51,12 +48,7 @@ public class ShopifyUtils {
     private  WebClient.Builder webClientBuilder;
     @Autowired
     private KafkaTemplate<String,String> kafkaTemplate;
-    @Autowired
-    private ModelMapper modelMapper;
-    private static final Integer CUSTOMER_COUNT_ERROR = -1;
-    private static final Integer PRODUCT_COUNT_ERROR = -1;
-
-
+    private static final Integer RESOURCES_COUNT_ERROR = -1;
     public boolean verifyPostHMAC(HttpServletRequest request, String requestBodyString){
         if(!isShopifyRequest(request)){
             return false;
@@ -103,37 +95,12 @@ public class ShopifyUtils {
         return false;
     }
 
-    public Integer  countDataCustomer()
+
+    public Integer  countDataResource(String url)
     {
         webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
 
-        String url = "/customers/count.json";
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(
-                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()),
-                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue())
-        );
 
-
-        try{
-            Mono<Integer> quatityCustomer = webClientBuilder.build().get()
-                    .uri(url)
-                    .headers(httpHeaders -> httpHeaders.addAll(headers))
-                    .retrieve().bodyToMono(CustomerCountDTO.class)
-                    .map(CustomerCountDTO::getCount);
-            return  quatityCustomer.block();
-
-        }catch (Exception e){
-            e.printStackTrace();
-            return CUSTOMER_COUNT_ERROR;
-        }
-
-    }
-    public Integer  countDataProduct()
-    {
-        webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
-
-        String url = "/products/count.json";
         HttpHeaders headers = new HttpHeaders();
         headers.add(
                 env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()),
@@ -150,7 +117,7 @@ public class ShopifyUtils {
 
         }catch (Exception e){
             e.printStackTrace();
-            return PRODUCT_COUNT_ERROR;
+            return RESOURCES_COUNT_ERROR;
         }
 
     }
@@ -187,6 +154,7 @@ public class ShopifyUtils {
     }
 
     public String fetchDataShopify(HttpHeaders headers,String url,int quantity, int limit){
+
         int ceilRequest = (int) Math.ceil(quantity / (double) limit);
 
         // Calculate the number of iterations to save all customers to the DB
@@ -222,36 +190,29 @@ public class ShopifyUtils {
 
                 responseMono.subscribe(
                         response -> {
+                            ObjectMapper objectMapper = new ObjectMapper();
+                            FileWriter fileWriter = null;
+
                             switch(url) {
                                 case "/customers.json":
-                                    try{
-                                        FileWriter fileWriter = new FileWriter("/Users/khanhpn/Desktop/Graduation-Project/Clothes-Store/response.txt");
-                                        fileWriter.write(response);
-                                        fileWriter.close();
-                                    }catch(IOException e){
-                                        e.printStackTrace();
-                                    }
-
                                     this.sendEventKafkaToService("sync-customers-shopify",response);
                                     break;
                                 case "/products.json":
+                                    objectMapper = new ObjectMapper();
+                                    fileWriter = null;
+                                    String jsonModelService;
 
-                                    ObjectMapper objectMapper = new ObjectMapper();
-                                    FileWriter fileWriter = null;
-                                    String jsonProductDTO;
                                     try {
-
                                         fileWriter = new FileWriter("/Users/khanhpn/Desktop/Graduation-Project/Clothes-Store/response.txt");
 
                                         ProductDTOList productDTOList = objectMapper.readValue(response, ProductDTOList.class);
                                         // Write file and send event Kafka
                                         List<ProductDTO> products = productDTOList.getProducts();
                                         for (ProductDTO productDTO : products) {
-                                            jsonProductDTO = objectMapper.writeValueAsString(productDTO);
-                                            fileWriter.write(jsonProductDTO + "\n");
-                                            this.sendEventKafkaToService("sync-products-shopify",jsonProductDTO);
+                                            jsonModelService = objectMapper.writeValueAsString(productDTO);
+                                            fileWriter.write(jsonModelService + "\n");
+                                            this.sendEventKafkaToService("sync-products-shopify",jsonModelService);
                                         }
-
 
                                     } catch (Exception e) {
 
@@ -266,6 +227,19 @@ public class ShopifyUtils {
                                                 e.printStackTrace();
                                             }
                                         }
+                                    }
+                                    break;
+                                case "/collects.json":
+                                    try {
+                                        CollectionDTOList collectionDTOList = objectMapper.readValue(response, CollectionDTOList.class);
+                                        // Write file and send event Kafka
+                                        List<CollectionDTO> collectionDTOS = collectionDTOList.getCollects();
+                                        for (CollectionDTO collectionDTO : collectionDTOS) {
+                                            jsonModelService = objectMapper.writeValueAsString(collectionDTO);
+                                            this.sendEventKafkaToService("sync-collects-shopify",jsonModelService);
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
                                     }
                                     break;
                                 default:

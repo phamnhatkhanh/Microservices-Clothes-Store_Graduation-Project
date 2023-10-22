@@ -34,11 +34,16 @@ public class ShopifyController {
 
     @GetMapping("/test")
     public void test(){
-
+        shopifyService.syncCollectionsFromShopify();
 
 
 
     }
+    @GetMapping("/collections")
+    public void syncCollectionsFromShopify(){
+        shopifyService.syncCollectionsFromShopify();
+    }
+
     @GetMapping("/products")
     public void syncProductsFromShopify(){
         shopifyService.syncProductsFromShopify();
@@ -48,6 +53,7 @@ public class ShopifyController {
     public void syncCustomersFromShopify(){
         shopifyService.syncCustomersFromShopify();
     }
+
     @GetMapping("/register-webhook")
     public String registerWebhook(){
         return  shopifyService.registerWebhookStore();
@@ -61,17 +67,12 @@ public class ShopifyController {
     @PostMapping( "/webhooks")
     public ResponseEntity<String> receivedWebhookFromShopify(@RequestBody String webhookData, HttpServletRequest request) {
 
-        /*
-        - get webhook.
-        - send event -> listesn -> chuyển cho kafka.
-
-        * */
         if (shopifyUtils.verifyPostHMAC(request,webhookData)) {
 
             webhookService.sendWebhookToService("toic");
-            log.info("verifyWebhook validation is true and request is from shopify" );
-            log.info(webhookData.toString());
-            shopifyUtils.countDataCustomer();
+//            log.info("verifyWebhook validation is true and request is from shopify" );
+//            log.info(webhookData.toString());
+//            shopifyUtils.countDataCustomer();
 //            System.out.println(String.valueOf());
 
             return ResponseEntity.ok("validate sucess request from webhook");
