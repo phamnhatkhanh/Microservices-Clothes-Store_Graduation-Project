@@ -41,6 +41,9 @@ public class KafkaConsumerConfig {
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, String.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "ecommerce_group_id");
+        props.put(ConsumerConfig.FETCH_MAX_BYTES_CONFIG, 10485880);
+//        props.put(ConsumerConfig.BY, 2*1024*1024);
+
 //        props.put(JsonDeserializer.TYPE_MAPPINGS, "product:com.clothesstore.customerservice.dto.ProductDTO, customer:com.clothesstore.customerservice.dto.CustomerDTO");
         return props;
     }

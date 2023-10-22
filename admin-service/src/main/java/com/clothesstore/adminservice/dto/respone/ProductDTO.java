@@ -1,31 +1,52 @@
 package com.clothesstore.adminservice.dto.respone;
 
-import com.clothesstore.adminservice.model.Address;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @ToString
-@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductDTO {
-//    private Long id;
-private String username;
-    private String email;
-    private String password;
-    private String phone;
-    private String state;
-    private String firstName;
-    private String lastName;
-    private Integer ordersCount;
-    private Float totalSpent;
-    private String errorMessage;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-//    private List<Address> addresses;
+    @JsonProperty("id")
+    private long id;
 
+    @JsonProperty("title")
+    private String title;
+
+    @JsonProperty("body_html")
+    private String bodyHtml;
+
+    @JsonProperty("vendor")
+    private String vendor;
+
+    @JsonProperty("product_type")
+    private String productType;
+
+    @JsonProperty("created_at")
+    private String createdAt;
+
+    @JsonProperty("handle")
+    private String handle;
+
+    @JsonProperty("updated_at")
+    private String updatedAt;
+
+    @JsonProperty("published_at")
+    private String publishedAt;
+
+    @JsonProperty("template_suffix")
+    private String templateSuffix;
+
+    @JsonProperty("published_scope")
+    private String publishedScope;
+
+    @JsonProperty("tags")
+    private String tags;
+
+    @JsonProperty("status")
+    private String status;
 
 }
