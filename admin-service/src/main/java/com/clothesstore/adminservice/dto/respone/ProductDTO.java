@@ -49,4 +49,5 @@ public class ProductDTO {
     @JsonProperty("status")
     private String status;
 
+
 }

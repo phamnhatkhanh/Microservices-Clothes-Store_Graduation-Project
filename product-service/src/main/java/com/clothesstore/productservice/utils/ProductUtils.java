@@ -21,7 +21,7 @@ public class ProductUtils {
 //    @Autowired
 //    private ModelMapper modelMapper;
 //
-//    public Customer mapModel(CustomerRequest customerRequest, Customer dataCustomer){
+//    public Customer mapModel(ProductRequest customerRequest, Customer dataCustomer){
 //        Field[] allFieldDataCustomer = customerRequest.getClass().getDeclaredFields();
 //        Field attributeCustomer;
 //
