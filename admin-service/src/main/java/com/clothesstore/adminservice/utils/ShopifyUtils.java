@@ -2,6 +2,8 @@ package com.clothesstore.adminservice.utils;
 
 import com.clothesstore.adminservice.dto.respone.CustomerCountDTO;
 import com.clothesstore.adminservice.dto.respone.ProductCountDTO;
+import com.clothesstore.adminservice.dto.respone.ProductDTO;
+import com.clothesstore.adminservice.dto.respone.ProductDTOList;
 import com.clothesstore.adminservice.enums.ShopifyEnvironment;
 
 import java.io.FileWriter;
@@ -17,6 +19,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -103,8 +107,8 @@ public class ShopifyUtils {
         String url = "/customers/count.json";
         HttpHeaders headers = new HttpHeaders();
         headers.add(
-                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
-                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue())
         );
 
 
@@ -129,8 +133,8 @@ public class ShopifyUtils {
         String url = "/products/count.json";
         HttpHeaders headers = new HttpHeaders();
         headers.add(
-                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
-                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue())
         );
 
         try{
@@ -187,12 +191,10 @@ public class ShopifyUtils {
 
         webClientBuilder.baseUrl(env.getProperty(ShopifyEnvironment.API_LINK.getValue())).build();
 
-
         try{
             UriComponentsBuilder uriBuilder = UriComponentsBuilder
                     .fromUriString(url)
                     .queryParam("limit",limit);
-
 
             for (int currentPage = 0; currentPage <= numberRequest; currentPage++) {
                 Mono<String> responseMono =
@@ -203,14 +205,11 @@ public class ShopifyUtils {
                         .exchange()
                         .flatMap(response -> {
                             HttpHeaders headersResponse = response.headers().asHttpHeaders();
+                            log.info("size request ");
+                            log.info(String.valueOf(headersResponse.getContentLength()));
                             List<String> linkHeaders = headersResponse.get("Link");
-
                             if (linkHeaders != null && !linkHeaders.isEmpty()) {
                                 String linkNextPage = this.extractNextPageLink(linkHeaders);
-
-                                log.info("next link page in shopify");
-                                log.info(linkNextPage);
-
                                 // Update the URI builder for the next iteration
                                 uriBuilder.replacePath(linkNextPage);
                                 return response.bodyToMono(String.class);
@@ -220,17 +219,55 @@ public class ShopifyUtils {
 
                 responseMono.subscribe(
                         response -> {
-                            try{
-                                FileWriter fileWriter = new FileWriter("/Users/khanhpn/Desktop/Graduation-Project/Clothes-Store/response.txt");
-                                fileWriter.write(response);
-                                fileWriter.close();
-                            }catch(IOException e){
-                                e.printStackTrace();
+                            switch(url) {
+                                case "/customers.json":
+                                    try{
+                                        FileWriter fileWriter = new FileWriter("/Users/khanhpn/Desktop/Graduation-Project/Clothes-Store/response.txt");
+                                        fileWriter.write(response);
+                                        fileWriter.close();
+                                    }catch(IOException e){
+                                        e.printStackTrace();
+                                    }
+
+                                    this.sendEventToService("sync-customers-shopify",response);
+                                    break;
+                                case "/products.json":
+
+                                    ObjectMapper objectMapper = new ObjectMapper();
+                                    FileWriter fileWriter = null;
+                                    try {
+
+                                        fileWriter = new FileWriter("/Users/khanhpn/Desktop/Graduation-Project/Clothes-Store/response.txt");
+
+                                        ProductDTOList productDTOList = objectMapper.readValue(response, ProductDTOList.class);
+                                        // Write file and send event Kafka
+                                        List<ProductDTO> products = productDTOList.getProducts();
+                                        for (ProductDTO productDTO : products) {
+                                            fileWriter.write(productDTO.toString() + "\n");
+                                            // Perform an operation on each product, for example, print its ID
+                                            this.sendEventToService("sync-products-shopify",productDTO.toString());
+                                        }
+
+
+                                    } catch (Exception e) {
+
+                                        e.printStackTrace();
+
+                                    }finally {
+                                        if (fileWriter != null) {
+                                            try {
+                                                fileWriter.close();
+                                            } catch (IOException e) {
+                                                // Handle the IOException if it occurs while closing the fileWriter
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    }
+                                    break;
+                                default:
+
                             }
 
-                            this.sendEvent("data from shpoify send to service registered");
-//                            this.sendEvent(response);
-//                            System.err.println("Error occurred: " + response);
                         },
                         error -> {
                             // Handle any errors
@@ -243,17 +280,17 @@ public class ShopifyUtils {
         }
         return "";
     }
-    public void sendEvent(String customer){
+    public void sendEventToService(String topic,String data){
         try {
-            CompletableFuture<SendResult<String,String>> future = kafkaTemplate.send("customer-topic", customer);
+            CompletableFuture<SendResult<String,String>> future = kafkaTemplate.send(topic, data);
 //            CompletableFuture<SendResult<String,Object>> future = kafkaTemplate.send("customer-topic", product);
             future.whenComplete((result, ex) ->{
                 if (ex == null) {
-                    System.out.println("Sent message=[" + customer.toString() +
+                    System.out.println("Sent message=[" + result.toString() +
                             "] with offset=[" + result.getRecordMetadata().offset() + "]");
                 } else {
                     System.out.println("Unable to send message=[" +
-                            customer.toString() + "] due to : " + ex.getMessage());
+                            result.toString() + "] due to : " + ex.getMessage());
                 }
             });
 

@@ -1,10 +1,15 @@
+*Admin
+ - get data from shopify (product).
+    - set attribute for ProductDTO.
+ see api + see flow -> test
+ result: Setup kafka: send message = string.
 
-- set keycloack -> session
-- sync data all data.
-Shopify-> gửi json
-Admin -> lọc webhook
-    -> gửi json đúng với service
-        -> mỗi service tự xử lý data.
+ - handel and send kafka to product service -> save database
+===
+mapping model
+Send model
+
+
 === Mai
 Task:
 - service shopify - admin - customer: sync data from shopify to system/

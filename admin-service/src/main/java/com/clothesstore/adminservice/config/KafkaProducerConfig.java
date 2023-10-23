@@ -1,6 +1,7 @@
 package com.clothesstore.adminservice.config;
 
 
+import com.clothesstore.adminservice.dto.respone.ProductDTO;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -25,29 +26,49 @@ public class KafkaProducerConfig {
 
 
     @Bean
-    public NewTopic createTopic(){
-        return new NewTopic("demo", 1, (short) 1);
+    public NewTopic topic() {
+        NewTopic newTopic = new NewTopic("sync-product-shopify", 1, (short) 1);
+        Map<String, String> configs = new HashMap<>();
+        configs.put("max.message.bytes", "20971520");
+        newTopic.configs(configs);
+        return newTopic;
     }
-
 
     @Bean
     public NewTopic topic1() {
-        return TopicBuilder.name("webhook-customer")
+        return TopicBuilder.name("sync-customer-shopify")
                 .build();
     }
 
     @Bean
-    public NewTopic topic2() {
-        return TopicBuilder.name("webhook-product")
-                .build();
-    }
-    @Bean
-    public Map<String,Object> producerConfig(){
-        Map<String,Object> props=new HashMap<>();
+    public ProducerFactory<String, ProductDTO> productDTOProducerFactory() {
+        Map<String, Object> props = new HashMap<>();
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-//        props.put(ProducerConfig.GROUP_ID_CONFIG, "ecommerce_group_id");
+        return new DefaultKafkaProducerFactory<>(props);
+    }
+
+    /**
+     * Kafka template will be used to publish messages to kafka
+     * @return : Configured kafka template to send cash transactions
+     */
+    @Bean
+    public KafkaTemplate<String, ProductDTO> kafkaProductDTOTemplate() {
+        return new KafkaTemplate<>(productDTOProducerFactory());
+    }
+
+
+    @Bean
+    public Map<String,Object> producerConfig(){
+        Map<String,Object> props=new HashMap<>();
+        props.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 10485880);
+
+//        props.put(ProducerConfig.BATCH_SIZE_CONFIG, 30000000);
+        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
         return props;
     }
 

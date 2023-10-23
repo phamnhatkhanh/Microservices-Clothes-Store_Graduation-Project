@@ -11,7 +11,7 @@ public class ProductServiceApplication {
         SpringApplication.run(ProductServiceApplication.class, args);
     }
 
-    @KafkaListener(id = "listener2", topics = "customer-topic",groupId = "ecommerce_group_id")
+    @KafkaListener(id = "listener2", topics = "sync-products-shopify",groupId = "ecommerce_group_id")
 //    public void receiveMessageFromAdmin(ConsumerRecord<String, CustomerDTO> message) {
     public void receiveMessageFromAdmin(String message) {
         // Process the received message from the Admin service

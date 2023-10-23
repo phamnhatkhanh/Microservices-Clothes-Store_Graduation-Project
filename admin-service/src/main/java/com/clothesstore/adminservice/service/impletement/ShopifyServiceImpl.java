@@ -55,7 +55,7 @@ public class ShopifyServiceImpl implements ShopifyService {
     }
     @Override
     public void syncProductsFromShopify() {
-        int limit = 100;
+        int limit = 30;
 
         // Count number of Customers
         int countProducts = shopifyUtils.countDataProduct();
