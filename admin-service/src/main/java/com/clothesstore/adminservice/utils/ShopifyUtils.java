@@ -9,6 +9,8 @@ import com.clothesstore.adminservice.enums.ShopifyEnvironment;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -21,6 +23,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -172,13 +175,13 @@ public class ShopifyUtils {
              linkUrlList) {
             if (this.matchNextPageUrlShopify(linkUrl)){
                 String linkNextPage = linkUrl.replaceAll("<|>; rel=\"next\"", "");
-                System.out.println("Cleaned Next URL: " + linkNextPage);
+//                System.out.println("Cleaned Next URL: " + linkNextPage);
                 return linkNextPage;
             }
 
         }
 
-        System.out.println("No 'next' URL found.");
+//        System.out.println("No 'next' URL found.");
         return "";
 
     }
@@ -205,8 +208,8 @@ public class ShopifyUtils {
                         .exchange()
                         .flatMap(response -> {
                             HttpHeaders headersResponse = response.headers().asHttpHeaders();
-                            log.info("size request ");
-                            log.info(String.valueOf(headersResponse.getContentLength()));
+//                            log.info("size request ");
+//                            log.info(String.valueOf(headersResponse.getContentLength()));
                             List<String> linkHeaders = headersResponse.get("Link");
                             if (linkHeaders != null && !linkHeaders.isEmpty()) {
                                 String linkNextPage = this.extractNextPageLink(linkHeaders);
@@ -229,12 +232,13 @@ public class ShopifyUtils {
                                         e.printStackTrace();
                                     }
 
-                                    this.sendEventToService("sync-customers-shopify",response);
+                                    this.sendEventKafkaToService("sync-customers-shopify",response);
                                     break;
                                 case "/products.json":
 
                                     ObjectMapper objectMapper = new ObjectMapper();
                                     FileWriter fileWriter = null;
+                                    String jsonProductDTO;
                                     try {
 
                                         fileWriter = new FileWriter("/Users/khanhpn/Desktop/Graduation-Project/Clothes-Store/response.txt");
@@ -243,9 +247,9 @@ public class ShopifyUtils {
                                         // Write file and send event Kafka
                                         List<ProductDTO> products = productDTOList.getProducts();
                                         for (ProductDTO productDTO : products) {
-                                            fileWriter.write(productDTO.toString() + "\n");
-                                            // Perform an operation on each product, for example, print its ID
-                                            this.sendEventToService("sync-products-shopify",productDTO.toString());
+                                            jsonProductDTO = objectMapper.writeValueAsString(productDTO);
+                                            fileWriter.write(jsonProductDTO + "\n");
+                                            this.sendEventKafkaToService("sync-products-shopify",jsonProductDTO);
                                         }
 
 
@@ -280,22 +284,45 @@ public class ShopifyUtils {
         }
         return "";
     }
-    public void sendEventToService(String topic,String data){
+    public void sendEventKafkaToService(String topic,String data){
         try {
             CompletableFuture<SendResult<String,String>> future = kafkaTemplate.send(topic, data);
 //            CompletableFuture<SendResult<String,Object>> future = kafkaTemplate.send("customer-topic", product);
-            future.whenComplete((result, ex) ->{
-                if (ex == null) {
-                    System.out.println("Sent message=[" + result.toString() +
-                            "] with offset=[" + result.getRecordMetadata().offset() + "]");
-                } else {
-                    System.out.println("Unable to send message=[" +
-                            result.toString() + "] due to : " + ex.getMessage());
-                }
-            });
+//            future.whenComplete((result, ex) ->{
+//                if (ex == null) {
+//                    System.out.println("Sent message=[" + result.toString() +
+//                            "] with offset=[" + result.getRecordMetadata().offset() + "]");
+//                } else {
+//                    System.out.println("Unable to send message=[" +
+//                            result.toString() + "] due to : " + ex.getMessage());
+//                }
+//            });
 
         } catch (Exception ex) {
             System.out.println("ERROR : "+ ex.getMessage());
+        }
+    }
+    public void writeProductsToCSV(List<ProductDTO> products, String filePath) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        filePath = classLoader.getResource("").getPath() + "/products.csv";
+        System.out.println("CSV file written successfully." + filePath);
+        try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
+            // Create the CSV writer with the given file path
+
+            // Write the header row
+            String[] header = {"id", "title", "vendor", "product_type", "created_at", "handle", "updated_at", "published_at", "template_suffix", "published_scope", "tags", "status"};
+
+            writer.writeNext(header);
+
+            // Write each product as a CSV row
+            for (ProductDTO product : products) {
+                String[] stringProductArray = product.toString().split(",");
+
+                writer.writeNext(stringProductArray);
+            }
+            System.out.println("CSV file written successfully." + filePath);
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

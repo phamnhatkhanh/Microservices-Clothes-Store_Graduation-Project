@@ -7,16 +7,13 @@ import lombok.extern.jackson.Jacksonized;
 
 import java.time.LocalDateTime;
 
-@Jacksonized
-@Builder
+
 @Data
 @ToString
-@AllArgsConstructor
-@NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductDTO {
     @JsonProperty("id")
-    private long id;
+    private Long id;
 
     @JsonProperty("title")
     private String title;

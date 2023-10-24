@@ -1,16 +1,14 @@
 package com.clothesstore.productservice.dto;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Data
 @ToString
-public class CustomerRespone {
+public class ProductRespone {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

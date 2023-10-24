@@ -17,40 +17,40 @@ import java.util.List;
 public class ProductController {
 //
 //    @Autowired
-//    private  CustomerService customerService;
+//    private  ProductService customerService;
 //
 //
 //    @GetMapping("/{id}")
-//    ResponseEntity<CustomerRespone> getCustomer (@PathVariable Long id) {
-//        CustomerRespone response = customerService.findById(id);
+//    ResponseEntity<ProductRespone> getCustomer (@PathVariable Long id) {
+//        ProductRespone response = customerService.findById(id);
 //        if (response.getErrorMessage() != null) {
 //            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
 //        }
 //        return ResponseEntity.ok(response);
 //    }
 //    @GetMapping("/byIds")
-//    List<CustomerRespone> getListCustomers(@RequestParam List<Long> ids) {
+//    List<ProductRespone> getListCustomers(@RequestParam List<Long> ids) {
 //        return customerService.findAllById(ids);
 //    }
 //    @GetMapping("/")
-//    List<CustomerRespone> getListCustomers() {
+//    List<ProductRespone> getListCustomers() {
 //        return customerService.all();
 //
 //    }
 //    @PostMapping("/")
-//    CustomerRespone createCustomer(@RequestBody CustomerRequest customerRequest) {
+//    ProductRespone createCustomer(@RequestBody ProductRequest customerRequest) {
 //        return customerService.save(customerRequest);
 //
 //    }
 //    @PutMapping("/test/{id}")
-//    CustomerRespone updateCustomerTest(@RequestBody CustomerRequest customerRequest, @PathVariable Long id) {
+//    ProductRespone updateCustomerTest(@RequestBody ProductRequest customerRequest, @PathVariable Long id) {
 //
 //        return customerService.update(id, customerRequest);
 //
 //    }
 //
 //    @PutMapping("/{id}")
-//    CustomerRespone updateCustomer(@RequestBody CustomerRequest customerRequest, @PathVariable Long id) {
+//    ProductRespone updateCustomer(@RequestBody ProductRequest customerRequest, @PathVariable Long id) {
 //
 //        return customerService.update(id, customerRequest);
 ////                .map(customer -> {
