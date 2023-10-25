@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,23 +24,25 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private ModelMapper modelMapper;
-//
-//    @Override
-//    public ProductRespone findById(Long id){
-//        Optional<Product> resultFound = customerRepository.findById(id);
-//        if(resultFound.isPresent()){
-//            ProductRespone responeProduct = modelMapper.map(resultFound.get(),ProductRespone.class);
-//            return modelMapper.map(responeProduct,ProductRespone.class);
-//        }else{
-//            ProductRespone responeProduct = modelMapper.map(resultFound,ProductRespone.class);
-//            responeProduct.setErrorMessage("Not found item");
-//            return responeProduct;
-//        }
-//    }
+
+    @Override
+    public Product findById(Long id){
+        Optional<Product> resultFound = productRepository.findById(id);
+        return resultFound.get();
+
+    }
+
+    @Override
+    public List<Product>  findProductsInCollection(Long collectionId) {
+        return productRepository.findProductsInCollection(collectionId);
+    }
+
+
 //
 //    @Override
 //    public List<ProductRespone> findAllById(List<Long> ids) {
 //        try {
+//            ObjectMapper objectMapper = new ObjectMapper();
 //            ObjectMapper objectMapper = new ObjectMapper();
 //
 //            // Convert the list to a JSON string
@@ -65,14 +69,14 @@ public class ProductServiceImpl implements ProductService {
 
 
 
-//    @Override
-    public ProductRespone save(ProductRequest customerRequest){
+    @Override
+    public Product save(Product productRequest){
 
-        Product newProduct = modelMapper.map(customerRequest,Product.class);
+        Product newProduct = modelMapper.map(productRequest,Product.class);
 
         Product createdProduct =  productRepository.save(newProduct);
 
-        return modelMapper.map(createdProduct,ProductRespone.class);
+        return modelMapper.map(createdProduct,Product.class);
 
     }
 
@@ -83,12 +87,12 @@ public class ProductServiceImpl implements ProductService {
 //        if(resultFoundProduct.isPresent()){
 //            Product prepateDataProduct = customerUtils.mapModel(customerRequest, resultFoundProduct.get()); // call function
 //            customerList.add(prepateDataProduct);
-//            List<Address> addresses = prepateDataProduct.getAddresses().stream()
-//                    .map(address -> modelMapper.map(address,Address.class))
-//                    .peek(address -> address.setProducts(customerList))
+//            List<Address> productes = prepateDataProduct.getAddresses().stream()
+//                    .map(product -> modelMapper.map(product,Address.class))
+//                    .peek(product -> product.setProducts(customerList))
 //                    .collect(Collectors.toList());
-////            addressRepository.saveAll(addresses);
-//            prepateDataProduct.setAddresses(addresses);
+////            productRepository.saveAll(productes);
+//            prepateDataProduct.setAddresses(productes);
 //            Product updatedProduct = customerRepository.save(prepateDataProduct);
 //            return modelMapper.map(updatedProduct,ProductRespone.class);
 //        }else{
@@ -96,12 +100,12 @@ public class ProductServiceImpl implements ProductService {
 //            Product prepateDataProduct = customerUtils.mapModel(customerRequest, new Product()); // call function
 //            prepateDataProduct.setId(id);
 //            customerList.add(prepateDataProduct);
-//            List<Address> addresses = prepateDataProduct.getAddresses().stream()
-//                    .map(address -> modelMapper.map(address,Address.class))
-//                    .peek(address -> address.setProducts(customerList))
+//            List<Address> productes = prepateDataProduct.getAddresses().stream()
+//                    .map(product -> modelMapper.map(product,Address.class))
+//                    .peek(product -> product.setProducts(customerList))
 //                    .collect(Collectors.toList());
 //
-//            prepateDataProduct.setAddresses(addresses);
+//            prepateDataProduct.setAddresses(productes);
 //
 //            Product updatedProduct = customerRepository.save(prepateDataProduct);
 //            return modelMapper.map(updatedProduct,ProductRespone.class);
@@ -115,8 +119,8 @@ public class ProductServiceImpl implements ProductService {
 //        Optional<Product> resultFound = customerRepository.findById(id);
 //        if(resultFound.isPresent()){
 //            Product dataProduct = resultFound.get();
-////            List<Address> address = dataProduct.getAddresses();
-////            dataProduct.setAddresses(address);
+////            List<Address> product = dataProduct.getAddresses();
+////            dataProduct.setAddresses(product);
 //            customerRepository.delete(dataProduct);
 //        }
 //    }
