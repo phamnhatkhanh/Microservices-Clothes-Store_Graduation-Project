@@ -41,10 +41,8 @@ public class ShopifyServiceImpl implements ShopifyService {
     @Override
     public void syncCustomersFromShopify() {
         int limit = 100;
-
         // Count number of Customers
-        int countCustomer = shopifyUtils.countDataCustomer();
-      
+        int countCustomer =  shopifyUtils.countDataResource("/customer/count.json");
         HttpHeaders headers = new HttpHeaders();
         headers.add(
                 env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
@@ -55,18 +53,28 @@ public class ShopifyServiceImpl implements ShopifyService {
     }
     @Override
     public void syncProductsFromShopify() {
-        int limit = 30;
-
+        int limit = 50;
         // Count number of Customers
-        int countProducts = shopifyUtils.countDataProduct();
-        int ceilRequest = (int) Math.ceil(countProducts / (double) limit);
-        int numberRequest = countProducts > limit ? ceilRequest : 1;
+        int countProducts = shopifyUtils.countDataResource("/products/count.json");
         HttpHeaders headers = new HttpHeaders();
         headers.add(
                 env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
                 env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
         );
         shopifyUtils.fetchDataShopify(headers,"/products.json",countProducts,limit);
+
+    }
+    @Override
+    public void syncCollectionsFromShopify() {
+        int limit = 100;
+        // Count number of Customers
+        int countCollections = shopifyUtils.countDataResource("/collects/count.json");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(
+                env.getProperty(ShopifyEnvironment.HEADER_TOKEN.getValue()).toString(),
+                env.getProperty(ShopifyEnvironment.ACCESS_TOKEN.getValue()).toString()
+        );
+        shopifyUtils.fetchDataShopify(headers,"/collects.json",countCollections,limit);
 
     }
 

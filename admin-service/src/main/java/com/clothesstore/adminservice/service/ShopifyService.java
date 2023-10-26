@@ -9,6 +9,7 @@ public interface ShopifyService {
     //
 
     void syncProductsFromShopify();
+    void syncCollectionsFromShopify();
     void syncCustomersFromShopify();
     String registerWebhookStore();
     String deleteWebhookStore();
