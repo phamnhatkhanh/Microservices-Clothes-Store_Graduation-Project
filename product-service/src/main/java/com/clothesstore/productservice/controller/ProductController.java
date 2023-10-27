@@ -11,10 +11,15 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/customers")
+@RequestMapping("/api/products")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductController {
+    @GetMapping("/")
+    ResponseEntity<String> getCustomer () {
+
+        return ResponseEntity.ok("response");
+    }
 //
 //    @Autowired
 //    private  ProductService customerService;

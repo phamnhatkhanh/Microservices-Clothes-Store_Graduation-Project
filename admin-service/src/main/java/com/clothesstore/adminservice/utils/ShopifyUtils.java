@@ -231,6 +231,9 @@ public class ShopifyUtils {
                                     break;
                                 case "/collects.json":
                                     try {
+//                                        log.info("--sync-collects-shopify");
+//                                        log.info(response);
+//                                        log.info("sync-collects-shopify--");
                                         CollectionDTOList collectionDTOList = objectMapper.readValue(response, CollectionDTOList.class);
                                         // Write file and send event Kafka
                                         List<CollectionDTO> collectionDTOS = collectionDTOList.getCollects();

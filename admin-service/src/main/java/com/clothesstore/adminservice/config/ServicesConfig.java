@@ -21,7 +21,7 @@ import java.util.HashMap;
 @Configuration
 public class ServicesConfig {
     @Bean
-    @LoadBalanced
+    // @LoadBalanced
     public WebClient.Builder webClientBuilder() {
         final int size = 10*1024 * 1024;
         final ExchangeStrategies strategies = ExchangeStrategies.builder()
