@@ -3,6 +3,7 @@ package com.clothesstore.productservice.service;
 import com.clothesstore.productservice.dto.ProductRequest;
 import com.clothesstore.productservice.dto.ProductRespone;
 import com.clothesstore.productservice.model.Product;
+import com.clothesstore.productservice.repository.CollectionRepository;
 import com.clothesstore.productservice.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,28 +11,35 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class CollectionServiceImpl implements CollectionService {
     @Autowired
-    private ProductRepository productRepository;
+    private CollectionRepository collectionRepository;
 
     @Autowired
     private ModelMapper modelMapper;
-//
-//    @Override
-//    public ProductRespone findById(Long id){
-//        Optional<Product> resultFound = customerRepository.findById(id);
+
+    @Override
+    public List<ProductRespone>  findById(Long id){
+        List<ProductRespone> resultFound = new ArrayList<>();
+//        List<ProductRespone> resultFound = collectionRepository.getProductsFromCollection(id);
 //        if(resultFound.isPresent()){
-//            ProductRespone responeProduct = modelMapper.map(resultFound.get(),ProductRespone.class);
+//            List<ProductRespone>  responeProduct = modelMapper.map(resultFound.get(),ProductRespone.class);
 //            return modelMapper.map(responeProduct,ProductRespone.class);
 //        }else{
-//            ProductRespone responeProduct = modelMapper.map(resultFound,ProductRespone.class);
+//            List<ProductRespone>  responeProduct = modelMapper.map(resultFound,ProductRespone.class);
 //            responeProduct.setErrorMessage("Not found item");
-//            return responeProduct;
+//            return resultFound;
 //        }
-//    }
+
+        return resultFound;
+    }
 //
 //    @Override
 //    public List<ProductRespone> findAllById(List<Long> ids) {
@@ -63,27 +71,27 @@ public class CollectionServiceImpl implements CollectionService {
 
 
 //    @Override
-    public ProductRespone save(ProductRequest customerRequest){
-
-        Product newProduct = modelMapper.map(customerRequest,Product.class);
-
-        Product createdProduct =  productRepository.save(newProduct);
-
-        return modelMapper.map(createdProduct,ProductRespone.class);
-
-    }
+//    public ProductRespone save(ProductRequest customerRequest){
+//
+//        Product newProduct = modelMapper.map(customerRequest,Product.class);
+//
+//        Product createdProduct =  productRepository.save(newProduct);
+//
+//        return modelMapper.map(createdProduct,ProductRespone.class);
+//
+//    }
 
 //    public ProductRespone update(Long id, ProductRequest customerRequest){
 //        Optional<Product> resultFoundProduct = customerRepository.findById(id);
 //        List<Product> customerList = new ArrayList<>();
 //
-//        if(resultFoundProduct.isPresent()){
+//        if(resultFoundProduct.isPresent()){prepateDataProduct.getAddresses().stream()
+////                    .map(address -> modelMapper.map(address,Address.class))
+////                    .peek(address -> address.setProducts(customerList))
+////                    .collect(Collectors.toList());
 //            Product prepateDataProduct = customerUtils.mapModel(customerRequest, resultFoundProduct.get()); // call function
 //            customerList.add(prepateDataProduct);
-//            List<Address> addresses = prepateDataProduct.getAddresses().stream()
-//                    .map(address -> modelMapper.map(address,Address.class))
-//                    .peek(address -> address.setProducts(customerList))
-//                    .collect(Collectors.toList());
+//            List<Address> addresses =
 ////            addressRepository.saveAll(addresses);
 //            prepateDataProduct.setAddresses(addresses);
 //            Product updatedProduct = customerRepository.save(prepateDataProduct);

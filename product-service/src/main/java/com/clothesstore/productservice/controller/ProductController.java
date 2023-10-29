@@ -1,5 +1,9 @@
 package com.clothesstore.productservice.controller;
 
+
+import com.clothesstore.productservice.model.Product;
+import com.clothesstore.productservice.service.CollectionService;
+import com.clothesstore.productservice.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +15,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 @Slf4j
 public class ProductController {
@@ -20,59 +24,23 @@ public class ProductController {
 
         return ResponseEntity.ok("response");
     }
-//
-//    @Autowired
-//    private  ProductService customerService;
-//
-//
-//    @GetMapping("/{id}")
-//    ResponseEntity<ProductRespone> getCustomer (@PathVariable Long id) {
-//        ProductRespone response = customerService.findById(id);
-//        if (response.getErrorMessage() != null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-//        }
-//        return ResponseEntity.ok(response);
-//    }
-//    @GetMapping("/byIds")
-//    List<ProductRespone> getListCustomers(@RequestParam List<Long> ids) {
-//        return customerService.findAllById(ids);
-//    }
-//    @GetMapping("/")
-//    List<ProductRespone> getListCustomers() {
-//        return customerService.all();
-//
-//    }
-//    @PostMapping("/")
-//    ProductRespone createCustomer(@RequestBody ProductRequest customerRequest) {
-//        return customerService.save(customerRequest);
-//
-//    }
-//    @PutMapping("/test/{id}")
-//    ProductRespone updateCustomerTest(@RequestBody ProductRequest customerRequest, @PathVariable Long id) {
-//
-//        return customerService.update(id, customerRequest);
-//
-//    }
-//
-//    @PutMapping("/{id}")
-//    ProductRespone updateCustomer(@RequestBody ProductRequest customerRequest, @PathVariable Long id) {
-//
-//        return customerService.update(id, customerRequest);
-////                .map(customer -> {
-////                    customer.setName(newCustomer.getName());
-////                    customer.setRole(newCustomer.getRole());
-////                    albumService.updateAlbum(id, newCustomer);
-////                    return customerService.update(customer);
-////                })
-////                .orElseGet(() -> {
-////                    newCustomer.setId(id);
-////                    return customerService.save(newCustomer);
-////                });
-//    }
-//
-//    @DeleteMapping("/{id}")
-//    void deleteById(@PathVariable Long id) {
-//        customerService.deleteById(id);
-//    }
+
+    @Autowired
+    private ProductService productService;
+
+    @Autowired
+    private CollectionService collectionService;
+
+    @GetMapping("/collections/{id}")
+    ResponseEntity<List<Product>> findProductsInCollection (@PathVariable Long id) {
+        List<Product> response = productService.findProductsInCollection(id);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/products/{id}")
+    ResponseEntity<Product> findProductid (@PathVariable Long id) {
+        Product response = productService.findById(id);
+        return ResponseEntity.ok(response);
+    }
+
 
 }
