@@ -1,5 +1,6 @@
 package com.clothesstore.adminservice.dto.respone;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -9,7 +10,19 @@ import lombok.ToString;
 @Data
 @ToString
 @JsonIgnoreProperties(ignoreUnknown = true)
+
 public class ProductDTO {
+    public static class Image {
+        private String src;
+
+        public String getSrc() {
+            return src;
+        }
+
+        public void setSrc(String src) {
+            this.src = src;
+        }
+    }
     @JsonProperty("id")
     private long id;
 
@@ -28,20 +41,16 @@ public class ProductDTO {
     @JsonProperty("created_at")
     private String createdAt;
 
-    @JsonProperty("handle")
-    private String handle;
-
     @JsonProperty("updated_at")
     private String updatedAt;
 
     @JsonProperty("published_at")
     private String publishedAt;
 
-    @JsonProperty("template_suffix")
-    private String templateSuffix;
+    private String banner;
 
-    @JsonProperty("published_scope")
-    private String publishedScope;
+    @JsonProperty("price")
+    private Double price;
 
     @JsonProperty("tags")
     private String tags;
@@ -51,3 +60,4 @@ public class ProductDTO {
 
 
 }
+

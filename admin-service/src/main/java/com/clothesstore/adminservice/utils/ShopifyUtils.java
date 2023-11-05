@@ -5,6 +5,7 @@ import com.clothesstore.adminservice.enums.ShopifyEnvironment;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +20,7 @@ import java.util.regex.Pattern;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ import org.springframework.core.env.Environment;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import com.clothesstore.adminservice.dto.respone.ProductDTO.Image;
 
 
 
@@ -44,6 +47,8 @@ import reactor.core.publisher.Mono;
 public class ShopifyUtils {
     @Autowired
     private Environment env;
+    @Autowired
+    private ModelMapper modelMapper;
     @Autowired
     private  WebClient.Builder webClientBuilder;
     @Autowired
@@ -94,7 +99,6 @@ public class ShopifyUtils {
         }
         return false;
     }
-
 
     public Integer  countDataResource(String url)
     {
@@ -176,12 +180,10 @@ public class ShopifyUtils {
                         .exchange()
                         .flatMap(response -> {
                             HttpHeaders headersResponse = response.headers().asHttpHeaders();
-//                            log.info("size request ");
-//                            log.info(String.valueOf(headersResponse.getContentLength()));
+
                             List<String> linkHeaders = headersResponse.get("Link");
                             if (linkHeaders != null && !linkHeaders.isEmpty()) {
                                 String linkNextPage = this.extractNextPageLink(linkHeaders);
-                                // Update the URI builder for the next iteration
                                 uriBuilder.replacePath(linkNextPage);
                                 return response.bodyToMono(String.class);
                             }
@@ -199,20 +201,36 @@ public class ShopifyUtils {
                                     break;
                                 case "/products.json":
                                     objectMapper = new ObjectMapper();
+
                                     fileWriter = null;
                                     String jsonModelService;
+                                    String imageUrl;
 
                                     try {
                                         fileWriter = new FileWriter("/Users/khanhpn/Desktop/Graduation-Project/Clothes-Store/response.txt");
 
-                                        ProductDTOList productDTOList = objectMapper.readValue(response, ProductDTOList.class);
-                                        // Write file and send event Kafka
-                                        List<ProductDTO> products = productDTOList.getProducts();
-                                        for (ProductDTO productDTO : products) {
+                                        JsonNode jsonNode = objectMapper.readTree(response);
+
+                                        JsonNode products = jsonNode.get("products");
+                                        for (JsonNode product : products) {
+
+                                            ProductDTO productDTO = objectMapper.treeToValue(product, ProductDTO.class);
+                                            Double price = product.get("variants")!= null? product.get("variants").get(0).get("price").asDouble():0;
+                                            if(product.get("image") != null){
+                                                imageUrl = product.get("image").get("src").asText();
+                                            }else{
+                                                imageUrl = product.get("images")!= null? product.get("images").get(0).get("src").asText() : "";
+                                            }
+                                            productDTO.setPrice(price);
+                                            productDTO.setBanner(imageUrl);
+
                                             jsonModelService = objectMapper.writeValueAsString(productDTO);
+                                            System.out.println("Price: " + imageUrl);
                                             fileWriter.write(jsonModelService + "\n");
+
                                             this.sendEventKafkaToService("sync-products-shopify",jsonModelService);
                                         }
+
 
                                     } catch (Exception e) {
 
@@ -223,7 +241,6 @@ public class ShopifyUtils {
                                             try {
                                                 fileWriter.close();
                                             } catch (IOException e) {
-                                                // Handle the IOException if it occurs while closing the fileWriter
                                                 e.printStackTrace();
                                             }
                                         }
@@ -231,11 +248,7 @@ public class ShopifyUtils {
                                     break;
                                 case "/collects.json":
                                     try {
-//                                        log.info("--sync-collects-shopify");
-//                                        log.info(response);
-//                                        log.info("sync-collects-shopify--");
                                         CollectionDTOList collectionDTOList = objectMapper.readValue(response, CollectionDTOList.class);
-                                        // Write file and send event Kafka
                                         List<CollectionDTO> collectionDTOS = collectionDTOList.getCollects();
                                         for (CollectionDTO collectionDTO : collectionDTOS) {
                                             jsonModelService = objectMapper.writeValueAsString(collectionDTO);

@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ProductDTO {
     @JsonProperty("id")
-    private Long id;
+    private long id;
 
     @JsonProperty("title")
     private String title;
@@ -30,27 +30,23 @@ public class ProductDTO {
     @JsonProperty("created_at")
     private String createdAt;
 
-    @JsonProperty("handle")
-    private String handle;
-
     @JsonProperty("updated_at")
     private String updatedAt;
 
     @JsonProperty("published_at")
     private String publishedAt;
 
-    @JsonProperty("template_suffix")
-    private String templateSuffix;
+    private String banner;
 
-    @JsonProperty("published_scope")
-    private String publishedScope;
+    @JsonProperty("price")
+    private Double price;
 
     @JsonProperty("tags")
     private String tags;
 
     @JsonProperty("status")
     private String status;
-//    private List<Address> addresses;
 
 
 }
+
