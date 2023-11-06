@@ -1,13 +1,13 @@
 package com.clothesstore.productservice.model;
 
 
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
 
 @Entity
 @Table(name = "product")
@@ -16,7 +16,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Product {
-
     @Id
     private Long id;
 
@@ -31,25 +30,17 @@ public class Product {
 
     private String createdAt;
 
-    private String handle;
-
     private String updatedAt;
 
     private String publishedAt;
 
-    private String templateSuffix;
+    private String banner;
 
-    private String publishedScope;
+    private Double price;
 
     private String tags;
 
     private String status;
-
-//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @JoinTable(name = "product_category",
-//            joinColumns = @JoinColumn(name = "product_id",referencedColumnName = "id"),
-//            inverseJoinColumns = @JoinColumn(name = "catefory_id",referencedColumnName = "id"))
-//    private List<Collection> collections;
 
 
 }
