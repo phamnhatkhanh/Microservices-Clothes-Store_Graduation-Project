@@ -3,6 +3,7 @@ package com.clothesstore.productservice.listener;
 import com.clothesstore.productservice.dto.ProductDTO;
 import com.clothesstore.productservice.model.Product;
 import com.clothesstore.productservice.repository.ProductRepository;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ public class ProductListener {
     @KafkaListener( topics = "sync-products-shopify",groupId = "ecommerce_group_id")
     public void receiveMessageFromAdmin(String productDtoJson) {
         ObjectMapper objectMapper = new ObjectMapper();
+//        JsonNode jsonNode = objectMapper.readTree(productDtoJson);
 
+//        JsonNode products = jsonNode.get("products");
         try{
             ProductDTO productDTO = objectMapper.readValue(productDtoJson, ProductDTO.class);
             Product dataProduct = modelMapper.map(productDTO,Product.class);

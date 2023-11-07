@@ -36,6 +36,7 @@ public class ProductDTO {
     @JsonProperty("published_at")
     private String publishedAt;
 
+    @JsonProperty("banner")
     private String banner;
 
     @JsonProperty("price")
