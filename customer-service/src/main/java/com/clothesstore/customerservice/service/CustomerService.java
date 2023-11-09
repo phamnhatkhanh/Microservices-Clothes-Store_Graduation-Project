@@ -14,7 +14,7 @@ public interface CustomerService {
 
     List<CustomerRespone> findAllById(@RequestParam List<Long> ids);
 
-    CustomerRespone save(CustomerRequest customerRequest);
+    String save(String customerRequest);
 
     CustomerRespone update(Long id, CustomerRequest customerRequest);
 

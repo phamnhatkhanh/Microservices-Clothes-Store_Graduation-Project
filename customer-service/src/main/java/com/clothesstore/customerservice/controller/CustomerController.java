@@ -40,15 +40,10 @@ public class CustomerController {
         return customerService.all();
 
     }
-    @PostMapping("/")
-    CustomerRespone createCustomer(@RequestBody CustomerRequest customerRequest) {
-        return customerService.save(customerRequest);
-
-    }
-    @PutMapping("/test/{id}")
-    CustomerRespone updateCustomerTest(@RequestBody CustomerRequest customerRequest, @PathVariable Long id) {
-
-        return customerService.update(id, customerRequest);
+    @PostMapping("/subscribe")
+    ResponseEntity<String> subscribeToNewsletter(@RequestBody String customerRequest) {
+        String result = customerService.save(customerRequest);
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
 
     }
 
