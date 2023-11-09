@@ -31,8 +31,5 @@ public class Collection {
 
     private String sortValue;
 
-//    @ManyToMany(mappedBy = "categories")
-//    private List<Product> products;
-
 
 }
