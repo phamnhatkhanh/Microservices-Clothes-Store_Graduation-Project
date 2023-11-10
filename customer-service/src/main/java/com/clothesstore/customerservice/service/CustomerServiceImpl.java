@@ -1,13 +1,15 @@
 package com.clothesstore.customerservice.service;
 
-import com.clothesstore.customerservice.dto.AddressRequest;
 import com.clothesstore.customerservice.dto.CustomerRespone;
 import com.clothesstore.customerservice.dto.CustomerRequest;
 import com.clothesstore.customerservice.model.Address;
 import com.clothesstore.customerservice.model.Customer;
+import com.clothesstore.customerservice.model.CustomerStore;
 import com.clothesstore.customerservice.repository.CustomerRepository;
+import com.clothesstore.customerservice.repository.CustomerStoreRepository;
 import com.clothesstore.customerservice.utils.CustomerUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +28,8 @@ import java.util.List;
 public class CustomerServiceImpl implements CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
+    @Autowired
+    private CustomerStoreRepository customerStoreRepository;
     @Autowired
     private CustomerUtils customerUtils;
     @Autowired
@@ -76,26 +78,18 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public CustomerRespone save(CustomerRequest customerRequest){
+    public String save(String customerRequest){
+        try{
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+            CustomerStore newCustomerStore = objectMapper.readValue(customerRequest, CustomerStore.class);
+            CustomerStore createdCustomer =  customerStoreRepository.save(newCustomerStore);
 
-        Customer newCustomer = modelMapper.map(customerRequest,Customer.class);
-
-        List<Address> addressList = new ArrayList<>();
-        List<Customer> customerList = new ArrayList<>();
-        customerList.add(newCustomer);
-
-        for (AddressRequest addressRequest : customerRequest.getAddressRequest()) {
-            Address address = modelMapper.map(addressRequest,Address.class);
-            address.setCustomers(customerList);
-            addressList.add(address);
+            return createdCustomer.toString();
+        } catch (Exception e) {
+            return "Error processing the order request";
         }
-
-        newCustomer.setAddresses(addressList);
-        Customer createdCustomer =  customerRepository.save(newCustomer);
-
-        return modelMapper.map(createdCustomer,CustomerRespone.class);
-
-    }
+}
 
     public CustomerRespone update(Long id, CustomerRequest customerRequest){
         Optional<Customer> resultFoundCustomer = customerRepository.findById(id);
@@ -141,4 +135,25 @@ public class CustomerServiceImpl implements CustomerService {
             customerRepository.delete(dataCustomer);
         }
     }
+//    @Override
+//    public CustomerRespone saveKafka(CustomerRequest customerRequest){
+//
+//        Customer newCustomer = modelMapper.map(customerRequest,Customer.class);
+//
+//        List<Address> addressList = new ArrayList<>();
+//        List<Customer> customerList = new ArrayList<>();
+//        customerList.add(newCustomer);
+//
+//        for (AddressRequest addressRequest : customerRequest.getAddressRequest()) {
+//            Address address = modelMapper.map(addressRequest,Address.class);
+//            address.setCustomers(customerList);
+//            addressList.add(address);
+//        }
+//
+//        newCustomer.setAddresses(addressList);
+//        Customer createdCustomer =  customerRepository.save(newCustomer);
+//
+//        return modelMapper.map(createdCustomer,CustomerRespone.class);
+//
+//    }
 }
