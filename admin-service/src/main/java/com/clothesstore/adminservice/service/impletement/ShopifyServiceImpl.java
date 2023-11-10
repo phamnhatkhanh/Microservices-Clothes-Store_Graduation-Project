@@ -41,7 +41,6 @@ public class ShopifyServiceImpl implements ShopifyService {
     @Override
     public void syncCustomersFromShopify() {
         int limit = 100;
-        // Count number of Customers
         int countCustomer =  shopifyUtils.countDataResource("/customer/count.json");
         HttpHeaders headers = new HttpHeaders();
         headers.add(

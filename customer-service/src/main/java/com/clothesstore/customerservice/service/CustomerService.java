@@ -14,8 +14,9 @@ public interface CustomerService {
 
     List<CustomerRespone> findAllById(@RequestParam List<Long> ids);
 
-    String save(String customerRequest);
+    String saveCustomerStore(String customerRequest);
 
+    CustomerRespone save(CustomerRequest customerRequest);
     CustomerRespone update(Long id, CustomerRequest customerRequest);
 
     void deleteById(Long id);

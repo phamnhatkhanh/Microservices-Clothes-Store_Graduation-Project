@@ -22,7 +22,6 @@ public class CustomerController {
     @Autowired
     private  CustomerService customerService;
 
-
     @GetMapping("/{id}")
     ResponseEntity<CustomerRespone> getCustomer (@PathVariable Long id) {
         CustomerRespone response = customerService.findById(id);
@@ -38,29 +37,16 @@ public class CustomerController {
     @GetMapping("/")
     List<CustomerRespone> getListCustomers() {
         return customerService.all();
-
     }
     @PostMapping("/subscribe")
     ResponseEntity<String> subscribeToNewsletter(@RequestBody String customerRequest) {
-        String result = customerService.save(customerRequest);
+        String result = customerService.saveCustomerStore(customerRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
-
     }
 
     @PutMapping("/{id}")
     CustomerRespone updateCustomer(@RequestBody CustomerRequest customerRequest, @PathVariable Long id) {
-
         return customerService.update(id, customerRequest);
-//                .map(customer -> {
-//                    customer.setName(newCustomer.getName());
-//                    customer.setRole(newCustomer.getRole());
-//                    albumService.updateAlbum(id, newCustomer);
-//                    return customerService.update(customer);
-//                })
-//                .orElseGet(() -> {
-//                    newCustomer.setId(id);
-//                    return customerService.save(newCustomer);
-//                });
     }
 
     @DeleteMapping("/{id}")

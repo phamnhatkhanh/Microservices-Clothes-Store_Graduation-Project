@@ -132,7 +132,6 @@ public class ShopifyUtils {
         Pattern pattern = Pattern.compile(urlPattern);
         Matcher matcher = pattern.matcher(linkUrl);
 
-        // Find the first match and extract the "next" URL.
         if (matcher.find()) {
             return true;
         } else {
@@ -297,14 +296,10 @@ public class ShopifyUtils {
         filePath = classLoader.getResource("").getPath() + "/products.csv";
         System.out.println("CSV file written successfully." + filePath);
         try (CSVWriter writer = new CSVWriter(new FileWriter(filePath))) {
-            // Create the CSV writer with the given file path
-
-            // Write the header row
             String[] header = {"id", "title", "vendor", "product_type", "created_at", "handle", "updated_at", "published_at", "template_suffix", "published_scope", "tags", "status"};
 
             writer.writeNext(header);
 
-            // Write each product as a CSV row
             for (ProductDTO product : products) {
                 String[] stringProductArray = product.toString().split(",");
 

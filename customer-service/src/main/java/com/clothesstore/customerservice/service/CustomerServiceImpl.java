@@ -1,5 +1,6 @@
 package com.clothesstore.customerservice.service;
 
+import com.clothesstore.customerservice.dto.AddressRequest;
 import com.clothesstore.customerservice.dto.CustomerRespone;
 import com.clothesstore.customerservice.dto.CustomerRequest;
 import com.clothesstore.customerservice.model.Address;
@@ -52,14 +53,9 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerRespone> findAllById(List<Long> ids) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-
-            // Convert the list to a JSON string
             String json = objectMapper.writeValueAsString(ids);
-
-            // Print the JSON string
             System.out.println(json);
         } catch (JsonProcessingException e) {
-            // Handle the exception (e.g., log it or take appropriate action)
             e.printStackTrace();
         }
 
@@ -78,7 +74,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public String save(String customerRequest){
+    public String saveCustomerStore(String customerRequest){
         try{
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -107,7 +103,6 @@ public class CustomerServiceImpl implements CustomerService {
             Customer updatedCustomer = customerRepository.save(prepateDataCustomer);
             return modelMapper.map(updatedCustomer,CustomerRespone.class);
         }else{
-
             Customer prepateDataCustomer = customerUtils.mapModel(customerRequest, new Customer()); // call function
             prepateDataCustomer.setId(id);
             customerList.add(prepateDataCustomer);
@@ -135,25 +130,26 @@ public class CustomerServiceImpl implements CustomerService {
             customerRepository.delete(dataCustomer);
         }
     }
-//    @Override
-//    public CustomerRespone saveKafka(CustomerRequest customerRequest){
-//
-//        Customer newCustomer = modelMapper.map(customerRequest,Customer.class);
-//
-//        List<Address> addressList = new ArrayList<>();
-//        List<Customer> customerList = new ArrayList<>();
-//        customerList.add(newCustomer);
-//
-//        for (AddressRequest addressRequest : customerRequest.getAddressRequest()) {
-//            Address address = modelMapper.map(addressRequest,Address.class);
-//            address.setCustomers(customerList);
-//            addressList.add(address);
-//        }
-//
-//        newCustomer.setAddresses(addressList);
-//        Customer createdCustomer =  customerRepository.save(newCustomer);
-//
-//        return modelMapper.map(createdCustomer,CustomerRespone.class);
-//
-//    }
+
+    @Override
+    public CustomerRespone save(CustomerRequest customerRequest){
+
+        Customer newCustomer = modelMapper.map(customerRequest,Customer.class);
+
+        List<Address> addressList = new ArrayList<>();
+        List<Customer> customerList = new ArrayList<>();
+        customerList.add(newCustomer);
+
+        for (AddressRequest addressRequest : customerRequest.getAddressRequest()) {
+            Address address = modelMapper.map(addressRequest,Address.class);
+            address.setCustomers(customerList);
+            addressList.add(address);
+        }
+
+        newCustomer.setAddresses(addressList);
+        Customer createdCustomer =  customerRepository.save(newCustomer);
+
+        return modelMapper.map(createdCustomer,CustomerRespone.class);
+
+    }
 }
