@@ -21,11 +21,11 @@
 | Order Service    | Completed ✔️   |
 | Admin Service    | Completed ✔️   |
 | Product Service  | Completed ✔️   |
-| Customer Service | In Progress👷  |                                                                                                                  
+| Customer Service | In Progress👷  | 
+| Auth Service | In Progress👷 |
+| Nofication Service | In Progress👷 |
 | Shipping Service | Not Started 🚩 |
-| Auth Service | Not Started 🚩 |
 | Payment Service | Not Started 🚩 |
-| Nofication Service | Not Started 🚩 |
 | Inventory Service | Not Started 🚩 |
 | Shipping Service | Not Started 🚩 |
 
